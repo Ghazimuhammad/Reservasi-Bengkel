@@ -20,7 +20,7 @@ database_login = ref.get()
 class Login(QMainWindow):
     def __init__(self):
         super(Login, self).__init__()
-        self.login_page = uic.loadUi('login.ui', self)
+        self.login_page = uic.loadUi('file_ui/login.ui', self)
 
         self.username = self.findChild(QLineEdit, 'username_input')
         self.password = self.findChild(QLineEdit, 'password_input')
@@ -83,7 +83,7 @@ class Signup(QMainWindow):
     def __init__(self):
         super(Signup, self).__init__()
 
-        self.signup_page = uic.loadUi('signup.ui', self)
+        self.signup_page = uic.loadUi('file_ui/signup.ui', self)
 
         self.back_button = self.findChild(QPushButton, 'push_back')
         self.back_button.clicked.connect(self.to_login)
@@ -179,6 +179,6 @@ class Main(QMainWindow):
     def __init__(self):
         super(Main, self).__init__()
 
-        self.signup_page = uic.loadUi('main.ui', self)
+        self.main_page = uic.loadUi('file_ui/main.ui', self)
 
         self.show()
