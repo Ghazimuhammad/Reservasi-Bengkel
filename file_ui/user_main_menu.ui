@@ -45,7 +45,7 @@
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">image: url(:/newPrefix/image 2.png);</string>
+        <string notr="true">image: url(:/Logo/Pictures/image 2.png);</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::StyledPanel</enum>
@@ -140,7 +140,7 @@ QPushButton:pressed {
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="feather/icon_resources.qrc">
+          <iconset resource="Pictures/feather/icon_resources.qrc">
            <normaloff>:/icons/settings.svg</normaloff>:/icons/settings.svg</iconset>
          </property>
          <property name="iconSize">
@@ -230,7 +230,7 @@ QPushButton:pressed {
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="feather/icon_resources.qrc">
+          <iconset resource="Pictures/feather/icon_resources.qrc">
            <normaloff>:/icons/tool.svg</normaloff>:/icons/tool.svg</iconset>
          </property>
          <property name="iconSize">
@@ -320,7 +320,7 @@ QPushButton:pressed {
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="feather/icon_resources.qrc">
+          <iconset resource="Pictures/feather/icon_resources.qrc">
            <normaloff>:/icons/grid.svg</normaloff>:/icons/grid.svg</iconset>
          </property>
          <property name="iconSize">
@@ -436,7 +436,7 @@ QPushButton:pressed {
  </widget>
  <resources>
   <include location="Pictures.qrc"/>
-  <include location="feather/icon_resources.qrc"/>
+  <include location="Pictures/feather/icon_resources.qrc"/>
  </resources>
  <connections/>
 </ui>
