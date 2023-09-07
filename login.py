@@ -12,14 +12,13 @@ import re
 
 cred_obj = firebase_admin.credentials.Certificate('ProjectBengkel.json')
 default_app = firebase_admin.initialize_app(cred_obj, {'databaseURL': 'https://projectbengkel-f2242-default-rtdb.asia-southeast1.firebasedatabase.app/'})
-ref = db.reference('/Login')
-if ref.get() is None:
-    ref.set({'admin@gmailcom':'Haloadmin1234'})
-database_login = ref.get()
+
 
 class Login(QMainWindow):
     def __init__(self):
         super(Login, self).__init__()
+        self.ref = db.reference('/Login')
+        self.database_login = self.ref.get()
         self.login_page = uic.loadUi('file_ui/login.ui', self)
 
         self.username = self.findChild(QLineEdit, 'username_input')
@@ -43,7 +42,7 @@ class Login(QMainWindow):
         password = self.password.text()
         username_nonvalid = True
         password_nonvalid = True
-        for key, value in database_login.items():
+        for key, value in self.database_login.items():
             if key == username.replace('.', ''):
                 username_nonvalid = False
                 if value == password:
@@ -82,6 +81,8 @@ class Login(QMainWindow):
 class Signup(QMainWindow):
     def __init__(self):
         super(Signup, self).__init__()
+        self.ref = db.reference('/Login')
+        self.database_login = self.ref.get()
 
         self.signup_page = uic.loadUi('file_ui/signup.ui', self)
 
@@ -107,10 +108,11 @@ class Signup(QMainWindow):
         username = self.username_input.text()
         password = self.password_input.text()
         conpassword = self.conpassword_input.text()
-        username_not_exist = False
-        for key in database_login.keys():
-            if key == username.replace('.', ''):
-                username_not_exist = True
+        self.username_not_exist = False
+        if self.database_login is not None:
+            for key in self.database_login.keys():
+                if key == username.replace('.', ''):
+                    self.username_not_exist = True
 
         if self.invalid_username(username):
             self.remove_label()
@@ -121,17 +123,18 @@ class Signup(QMainWindow):
             self.conpassword_input.clear()
             self.alert("password must be 8 - 16 character and contains at least one uppercase character one lowercase character and one number")
         
-        elif username_not_exist:
+        elif self.username_not_exist:
             self.remove_label()
             self.alert("This Email already exist.")
 
-        elif password == conpassword and self.valid_email_password(username, password) and not(username_not_exist):
+        elif self.valid_login(username, password, conpassword):
             username = username.replace('.', '')
             data_hold = {username: password}
-            if ref.get() is None:
-                ref.set({'admin@gmailcom':'Haloadmin1234'})
+            if self.database_login is None:
+                self.ref.set({'admin@gmailcom':'Haloadmin1234'})
+                self.ref.update(data_hold)
             else:
-                ref.update(data_hold)
+                self.ref.update(data_hold)
 
             self.remove_label()
             self.success_create_account()
@@ -140,6 +143,8 @@ class Signup(QMainWindow):
             self.password_input.clear()
             self.conpassword_input.clear()
             self.alert("Password doesn't match confirmation password!")
+            
+        self.to_login()
     
     def alert(self, text):
         alert = QMessageBox(self)
@@ -168,6 +173,9 @@ class Signup(QMainWindow):
 
     def valid_email_password(self, username, password):
         return not(self.invalid_password(password)) and not(self.invalid_username(username))
+    
+    def valid_login(self, username, password, conpassword):
+        return password == conpassword and self.valid_email_password(username, password) and not(self.username_not_exist)
     
     def remove_label(self):
         self.username_input.clear()
