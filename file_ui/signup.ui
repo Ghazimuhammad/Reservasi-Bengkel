@@ -22,7 +22,7 @@
      <rect>
       <x>50</x>
       <y>190</y>
-      <width>381</width>
+      <width>401</width>
       <height>277</height>
      </rect>
     </property>
@@ -39,10 +39,10 @@
         <widget class="QLabel" name="labeL_confirm_2">
          <property name="font">
           <font>
-           <family>Helvetica</family>
+           <family>Roboto Slab</family>
            <pointsize>16</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
+           <weight>50</weight>
+           <bold>false</bold>
           </font>
          </property>
          <property name="styleSheet">
@@ -57,10 +57,10 @@
         <widget class="QLabel" name="labeL_password_3">
          <property name="font">
           <font>
-           <family>Helvetica</family>
+           <family>Roboto Slab</family>
            <pointsize>16</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
+           <weight>50</weight>
+           <bold>false</bold>
           </font>
          </property>
          <property name="styleSheet">
@@ -77,9 +77,12 @@
       <widget class="QLineEdit" name="username_input">
        <property name="font">
         <font>
-         <family>Helvetica</family>
+         <family>Roboto Slab</family>
          <pointsize>10</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);</string>
        </property>
       </widget>
      </item>
@@ -87,10 +90,10 @@
       <widget class="QLabel" name="label_username">
        <property name="font">
         <font>
-         <family>Helvetica</family>
+         <family>Roboto Slab</family>
          <pointsize>16</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
+         <weight>50</weight>
+         <bold>false</bold>
         </font>
        </property>
        <property name="styleSheet">
@@ -105,10 +108,10 @@
       <widget class="QLabel" name="labeL_password">
        <property name="font">
         <font>
-         <family>Helvetica</family>
+         <family>Roboto Slab</family>
          <pointsize>16</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
+         <weight>50</weight>
+         <bold>false</bold>
         </font>
        </property>
        <property name="styleSheet">
@@ -123,9 +126,12 @@
       <widget class="QLineEdit" name="password_input">
        <property name="font">
         <font>
-         <family>Helvetica</family>
+         <family>Roboto Slab</family>
          <pointsize>10</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);</string>
        </property>
        <property name="echoMode">
         <enum>QLineEdit::Password</enum>
@@ -138,7 +144,7 @@
         <widget class="QPushButton" name="push_create_account">
          <property name="font">
           <font>
-           <family>Helvetica</family>
+           <family>Roboto Slab</family>
            <pointsize>9</pointsize>
            <weight>75</weight>
            <bold>true</bold>
@@ -147,7 +153,7 @@
          <property name="styleSheet">
           <string notr="true">/* PUSH BUTTON */
 QPushButton {
-    background-color: rgb(255, 0, 127);
+    background-color: #F59AB6;
     color: white;
     border: none;
     border-radius: 7px;
@@ -155,13 +161,12 @@ QPushButton {
 }
 
 QPushButton:hover {
-	background-color: rgb(223, 0, 112);
+	background-color: rgb(186, 117, 139);
 }
 
 QPushButton:pressed {
-    background-color: rgb(185, 0, 92);
+    background-color: rgb(109, 68, 81);
 }
-
 color: rgb(255, 255, 255);</string>
          </property>
          <property name="text">
@@ -191,9 +196,12 @@ color: rgb(255, 255, 255);</string>
       <widget class="QLineEdit" name="conpassword_input">
        <property name="font">
         <font>
-         <family>Helvetica</family>
+         <family>Roboto Slab</family>
          <pointsize>10</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: rgb(255, 255, 255);</string>
        </property>
        <property name="echoMode">
         <enum>QLineEdit::Password</enum>
@@ -213,11 +221,11 @@ color: rgb(255, 255, 255);</string>
     </property>
     <property name="font">
      <font>
-      <family>Helvetica</family>
+      <family>Roboto Slab</family>
       <pointsize>26</pointsize>
-      <weight>75</weight>
-      <italic>true</italic>
-      <bold>true</bold>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="autoFillBackground">
@@ -228,7 +236,7 @@ color: rgb(255, 255, 255);</string>
 color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));</string>
     </property>
     <property name="text">
-     <string>Sign Up</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#ffffff;&quot;&gt;Sign Up&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -255,7 +263,7 @@ color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>490</y>
+      <y>530</y>
       <width>161</width>
       <height>80</height>
      </rect>
@@ -268,10 +276,10 @@ color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 
       <widget class="QPushButton" name="push_back">
        <property name="font">
         <font>
-         <family>Helvetica</family>
+         <family>Roboto Slab</family>
          <pointsize>9</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
+         <weight>50</weight>
+         <bold>false</bold>
         </font>
        </property>
        <property name="styleSheet">
@@ -285,11 +293,11 @@ QPushButton {
 }
 
 QPushButton:hover {
-    background-color: rgb(255, 0, 127);
+	background-color: rgb(245, 154, 182);
 }
 
 QPushButton:pressed {
-    background-color: rgb(185, 0, 92);
+    background-color: rgb(109, 68, 81);
 }
 
 color: rgb(255, 255, 255);</string>
@@ -312,7 +320,7 @@ color: rgb(255, 255, 255);</string>
      <x>0</x>
      <y>0</y>
      <width>480</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>
