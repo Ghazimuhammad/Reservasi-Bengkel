@@ -147,7 +147,7 @@ color: rgb(255, 255, 255);</string>
     </property>
     <property name="styleSheet">
      <string notr="true">background-color: rgb(84, 84, 126);
-background-image: url(:/icons/tool.svg);</string>
+</string>
     </property>
     <property name="text">
      <string/>
@@ -220,7 +220,7 @@ color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="label_title">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>40</x>
       <y>30</y>
       <width>423</width>
       <height>78</height>
@@ -239,10 +239,10 @@ color: rgb(255, 255, 255);</string>
      <bool>false</bool>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(84, 84, 126, 0%);</string>
+     <string notr="true">background-color: rgb(84, 84, 126);</string>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Bengkel Jos Gandos&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Bengkel Jos Gandos&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -256,7 +256,7 @@ color: rgb(255, 255, 255);</string>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources>
-  <include location="feather/icon_resources.qrc"/>
+  <include location="../Pictures/feather/icon_resources.qrc"/>
  </resources>
  <connections/>
 </ui>

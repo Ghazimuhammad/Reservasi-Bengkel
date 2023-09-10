@@ -187,6 +187,6 @@ class Main(QMainWindow):
     def __init__(self):
         super(Main, self).__init__()
 
-        self.main_page = uic.loadUi('file_ui/main.ui', self)
+        self.main_page = uic.loadUi('file_ui/user_main_menu.ui', self)
 
         self.show()

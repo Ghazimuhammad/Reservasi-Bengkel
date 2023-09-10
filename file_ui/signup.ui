@@ -14,14 +14,14 @@
    <string>Sign Up</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(200, 200, 200);</string>
+   <string notr="true">background-color: rgb(45, 45, 68);</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>210</y>
+      <y>190</y>
       <width>381</width>
       <height>277</height>
      </rect>
@@ -45,6 +45,9 @@
            <bold>true</bold>
           </font>
          </property>
+         <property name="styleSheet">
+          <string notr="true">color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));</string>
+         </property>
          <property name="text">
           <string>Confirm</string>
          </property>
@@ -59,6 +62,9 @@
            <weight>75</weight>
            <bold>true</bold>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));</string>
          </property>
          <property name="text">
           <string>Password</string>
@@ -87,6 +93,9 @@
          <bold>true</bold>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true">color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));</string>
+       </property>
        <property name="text">
         <string>Username</string>
        </property>
@@ -101,6 +110,9 @@
          <weight>75</weight>
          <bold>true</bold>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));</string>
        </property>
        <property name="text">
         <string>Password</string>
@@ -133,7 +145,24 @@
           </font>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: rgb(255, 0, 0, 60%);</string>
+          <string notr="true">/* PUSH BUTTON */
+QPushButton {
+    background-color: rgb(255, 0, 127);
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 20px;
+}
+
+QPushButton:hover {
+	background-color: rgb(223, 0, 112);
+}
+
+QPushButton:pressed {
+    background-color: rgb(185, 0, 92);
+}
+
+color: rgb(255, 255, 255);</string>
          </property>
          <property name="text">
           <string>Create Account</string>
@@ -177,9 +206,9 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>40</y>
+      <y>20</y>
       <width>424</width>
-      <height>56</height>
+      <height>71</height>
      </rect>
     </property>
     <property name="font">
@@ -195,7 +224,8 @@
      <bool>false</bool>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(255, 0, 0, 0%);</string>
+     <string notr="true">background-color: rgb(84, 84, 126);
+color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));</string>
     </property>
     <property name="text">
      <string>Sign Up</string>
@@ -210,12 +240,12 @@
       <x>0</x>
       <y>-10</y>
       <width>531</width>
-      <height>151</height>
+      <height>131</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0.636816 rgba(255, 0, 0, 243), stop:1 rgba(255, 255, 255, 255));
-alternate-background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(0, 0, 0, 255), stop:0.05 rgba(14, 8, 73, 255), stop:0.36 rgba(28, 17, 145, 255), stop:0.6 rgba(126, 14, 81, 255), stop:0.75 rgba(234, 11, 11, 255), stop:0.79 rgba(244, 70, 5, 255), stop:0.86 rgba(255, 136, 0, 255), stop:0.935 rgba(239, 236, 55, 255));</string>
+     <string notr="true">background-color: rgb(84, 84, 126);
+</string>
     </property>
     <property name="text">
      <string/>
@@ -224,8 +254,8 @@ alternate-background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
    <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>520</y>
+      <x>50</x>
+      <y>490</y>
       <width>161</width>
       <height>80</height>
      </rect>
@@ -245,7 +275,24 @@ alternate-background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(255, 0, 0, 60%);</string>
+        <string notr="true">/* PUSH BUTTON */
+QPushButton {
+    background-color: rgb(80, 80, 122);
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 20px;
+}
+
+QPushButton:hover {
+    background-color: rgb(255, 0, 127);
+}
+
+QPushButton:pressed {
+    background-color: rgb(185, 0, 92);
+}
+
+color: rgb(255, 255, 255);</string>
        </property>
        <property name="text">
         <string>Back</string>
@@ -265,7 +312,7 @@ alternate-background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, 
      <x>0</x>
      <y>0</y>
      <width>480</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
