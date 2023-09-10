@@ -1,27 +1,29 @@
 from PyQt5 import uic
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import (
-    QMainWindow, 
-    QApplication, 
-    QPushButton,
-    QLineEdit,
-    QMessageBox)
+    QMainWindow, QPushButton,
+    QLineEdit,QMessageBox,
+    QLabel, QCompleter)
 import sys
 import firebase_admin
 from firebase_admin import db
 import re
+from user_main import UserMain
+
 
 cred_obj = firebase_admin.credentials.Certificate('ProjectBengkel.json')
 default_app = firebase_admin.initialize_app(cred_obj, {'databaseURL': 'https://projectbengkel-f2242-default-rtdb.asia-southeast1.firebasedatabase.app/'})
 
-
 class Login(QMainWindow):
     def __init__(self):
         super(Login, self).__init__()
+
         self.ref = db.reference('/Login')
         self.database_login = self.ref.get()
         self.login_page = uic.loadUi('file_ui/login.ui', self)
 
         self.username = self.findChild(QLineEdit, 'username_input')
+        self.username.setCompleter(QCompleter(['admin@gmail.com']))
         self.password = self.findChild(QLineEdit, 'password_input')
 
         self.create_account = self.findChild(QPushButton, 'push_create_account')
@@ -29,6 +31,11 @@ class Login(QMainWindow):
 
         self.login_button = self.findChild(QPushButton, 'push_login')
         self.login_button.clicked.connect(self.verify_login)
+
+        label = self.findChild(QLabel, 'label_2')
+        pixmap = QPixmap('Pictures/image 2.png')
+        label.setPixmap(pixmap)
+        label.setScaledContents(True)
 
         self.show()
     
@@ -61,7 +68,7 @@ class Login(QMainWindow):
         
     def to_main(self):
         self.login_page.close()
-        self.main_page = Main()
+        self.main_page = UserMain()
         self.main_page.show()
 
     def alert(self, text):
@@ -81,6 +88,7 @@ class Login(QMainWindow):
 class Signup(QMainWindow):
     def __init__(self):
         super(Signup, self).__init__()
+
         self.ref = db.reference('/Login')
         self.database_login = self.ref.get()
 
@@ -127,7 +135,12 @@ class Signup(QMainWindow):
             self.remove_label()
             self.alert("This Email already exist.")
 
-        elif self.valid_login(username, password, conpassword):
+        elif password != conpassword:
+            self.password_input.clear()
+            self.conpassword_input.clear()
+            self.alert("Password doesn't match confirmation password!")
+
+        else:
             username = username.replace('.', '')
             data_hold = {username: password}
             if self.database_login is None:
@@ -138,13 +151,8 @@ class Signup(QMainWindow):
 
             self.remove_label()
             self.success_create_account()
-        
-        elif password != conpassword:
-            self.password_input.clear()
-            self.conpassword_input.clear()
-            self.alert("Password doesn't match confirmation password!")
-            
-        self.to_login()
+            self.to_login()
+    
     
     def alert(self, text):
         alert = QMessageBox(self)
@@ -170,23 +178,8 @@ class Signup(QMainWindow):
     def invalid_username(self, username):
         regex_uname = r'[^@]+@[^@]+\.[^@]+'
         return not (re.fullmatch(regex_uname, username))
-
-    def valid_email_password(self, username, password):
-        return not(self.invalid_password(password)) and not(self.invalid_username(username))
-    
-    def valid_login(self, username, password, conpassword):
-        return password == conpassword and self.valid_email_password(username, password) and not(self.username_not_exist)
     
     def remove_label(self):
         self.username_input.clear()
         self.password_input.clear()
         self.conpassword_input.clear()
-
-
-class Main(QMainWindow):
-    def __init__(self):
-        super(Main, self).__init__()
-
-        self.main_page = uic.loadUi('file_ui/user_main_menu.ui', self)
-
-        self.show()
