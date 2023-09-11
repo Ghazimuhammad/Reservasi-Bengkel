@@ -40,6 +40,9 @@
     background-color: #2D2E43;
     color: white;
     border: none;
+	border: none;
+    border-radius: 7px;
+    padding: 10px 20px;
 }
 
 QPushButton:hover {
@@ -57,7 +60,7 @@ QPushButton:pressed {
    <widget class="QLabel" name="label_user">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>60</x>
       <y>100</y>
       <width>371</width>
       <height>51</height>
@@ -76,7 +79,7 @@ QPushButton:pressed {
      </font>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; color:#ffffff;&quot;&gt;Welcome Back User!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; color:#ffffff;&quot;&gt;Welcome Back User!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -374,6 +377,9 @@ color: rgb(255, 255, 255);</string>
       <weight>75</weight>
       <bold>true</bold>
      </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
     </property>
     <property name="text">
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt; color:#ffffff;&quot;&gt;CMech Service&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
