@@ -107,7 +107,7 @@ QPushButton:pressed {
         <enum>QLayout::SetFixedSize</enum>
        </property>
        <item>
-        <widget class="QPushButton" name="push_create_account_7">
+        <widget class="QPushButton" name="push_reservation">
          <property name="minimumSize">
           <size>
            <width>150</width>
