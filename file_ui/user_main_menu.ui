@@ -17,7 +17,7 @@
    <string notr="true">background-color: #2D2E43;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="push_my_booking">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -51,10 +51,10 @@ QPushButton:pressed {
 }</string>
     </property>
     <property name="text">
-     <string>Booking Saya</string>
+     <string>My Booking</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_6">
+   <widget class="QLabel" name="label_user">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -91,15 +91,15 @@ QPushButton:pressed {
    <widget class="QWidget" name="gridLayoutWidget_2">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>30</x>
       <y>240</y>
-      <width>401</width>
+      <width>414</width>
       <height>189</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_2">
      <property name="horizontalSpacing">
-      <number>10</number>
+      <number>28</number>
      </property>
      <item row="0" column="1">
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -110,13 +110,13 @@ QPushButton:pressed {
         <widget class="QPushButton" name="push_create_account_7">
          <property name="minimumSize">
           <size>
-           <width>100</width>
+           <width>150</width>
            <height>100</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>100</width>
+           <width>150</width>
            <height>100</height>
           </size>
          </property>
@@ -162,16 +162,17 @@ QPushButton:pressed {
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_3">
+        <widget class="QLabel" name="label_reservation">
          <property name="maximumSize">
           <size>
-           <width>100</width>
+           <width>150</width>
            <height>16777215</height>
           </size>
          </property>
          <property name="font">
           <font>
            <family>Roboto Slab</family>
+           <pointsize>12</pointsize>
           </font>
          </property>
          <property name="text">
@@ -190,7 +191,7 @@ QPushButton:pressed {
         <enum>QLayout::SetFixedSize</enum>
        </property>
        <item>
-        <widget class="QPushButton" name="push_create_account_6">
+        <widget class="QPushButton" name="push_sparepart">
          <property name="minimumSize">
           <size>
            <width>100</width>
@@ -214,7 +215,7 @@ QPushButton:pressed {
          <property name="styleSheet">
           <string notr="true">/* PUSH BUTTON */
 QPushButton {
-    background-color: #F59AB6;
+    background-color: rgb(80, 80, 122);
     color: white;
     border: none;
     border-radius: 7px;
@@ -222,12 +223,14 @@ QPushButton {
 }
 
 QPushButton:hover {
-	background-color: rgb(186, 117, 139);
+	background-color: rgb(245, 154, 182);
 }
 
 QPushButton:pressed {
     background-color: rgb(109, 68, 81);
-}</string>
+}
+
+color: rgb(255, 255, 255);</string>
          </property>
          <property name="text">
           <string/>
@@ -245,7 +248,7 @@ QPushButton:pressed {
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="label_sparepart">
          <property name="maximumSize">
           <size>
            <width>100</width>
@@ -255,6 +258,7 @@ QPushButton:pressed {
          <property name="font">
           <font>
            <family>Roboto Slab</family>
+           <pointsize>12</pointsize>
           </font>
          </property>
          <property name="text">
@@ -273,7 +277,7 @@ QPushButton:pressed {
         <enum>QLayout::SetFixedSize</enum>
        </property>
        <item>
-        <widget class="QPushButton" name="push_create_account_8">
+        <widget class="QPushButton" name="push_service_list">
          <property name="minimumSize">
           <size>
            <width>100</width>
@@ -297,7 +301,7 @@ QPushButton:pressed {
          <property name="styleSheet">
           <string notr="true">/* PUSH BUTTON */
 QPushButton {
-    background-color: #F59AB6;
+    background-color: rgb(80, 80, 122);
     color: white;
     border: none;
     border-radius: 7px;
@@ -305,12 +309,14 @@ QPushButton {
 }
 
 QPushButton:hover {
-	background-color: rgb(186, 117, 139);
+	background-color: rgb(245, 154, 182);
 }
 
 QPushButton:pressed {
     background-color: rgb(109, 68, 81);
-}</string>
+}
+
+color: rgb(255, 255, 255);</string>
          </property>
          <property name="text">
           <string/>
@@ -328,7 +334,7 @@ QPushButton:pressed {
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_4">
+        <widget class="QLabel" name="label_service_list">
          <property name="maximumSize">
           <size>
            <width>100</width>
@@ -338,10 +344,11 @@ QPushButton:pressed {
          <property name="font">
           <font>
            <family>Roboto Slab</family>
+           <pointsize>12</pointsize>
           </font>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;List &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Service&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Service&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;List&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -352,7 +359,7 @@ QPushButton:pressed {
      </item>
     </layout>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="label_title">
     <property name="geometry">
      <rect>
       <x>190</x>
@@ -361,11 +368,18 @@ QPushButton:pressed {
       <height>81</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Slab</family>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
     <property name="text">
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt; color:#ffffff;&quot;&gt;CMech Service&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_5">
+   <widget class="QLabel" name="logo">
     <property name="geometry">
      <rect>
       <x>10</x>

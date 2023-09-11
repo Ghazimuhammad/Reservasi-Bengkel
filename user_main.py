@@ -15,7 +15,7 @@ class UserMain(QMainWindow):
         label.setPixmap(pixmap)
         label.setScaledContents(True)
 
-        self.create_account = self.findChild(QPushButton, 'push_create_account_6')
+        self.create_account = self.findChild(QPushButton, 'push_sparepart')
         self.create_account.clicked.connect(self.to_sparepart)
 
         self.show()
@@ -31,10 +31,10 @@ class Sparepart(QMainWindow):
 
         self.main_page = uic.loadUi('file_ui/sparepart_menu.ui', self)
 
-        self.label = self.findChild(QLabel, 'label_2')
+        self.label = self.findChild(QLabel, 'logo')
         pixmap = QPixmap('Pictures/sparepart.jpeg')
         self.label.setPixmap(pixmap)
         # self.label.setStyleSheet("background-color: #2D2E43")
-        self.setStyleSheet("background-color: #2D2E43") 
+        # self.setStyleSheet("background-color: #2D2E43") 
         self.label.setScaledContents(True)
         self.show()
