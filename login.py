@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (
 import sys
 import re
 from user_main import UserMain
+from admin_main import AdminMain
 from cred import *
 
 
@@ -19,7 +20,7 @@ class Login(QMainWindow):
         self.login_page = uic.loadUi('file_ui/login.ui', self)
 
         self.username = self.findChild(QLineEdit, 'username_input')
-        self.username.setCompleter(QCompleter(['admin@gmail.com']))
+        self.username.setCompleter(QCompleter(['admin@gmail.com', 'halouser@gmail.com']))
         self.password = self.findChild(QLineEdit, 'password_input')
 
         self.create_account = self.findChild(QPushButton, 'push_create_account')
@@ -45,12 +46,15 @@ class Login(QMainWindow):
         password = self.password.text()
         username_nonvalid = True
         password_nonvalid = True
+        if username == 'admin@gmail.com' and password == 'Haloadmin1234':
+            self.to_admin_main()
+            return
         for key, value in self.database_login.items():
             if key == username.replace('.', ''):
                 username_nonvalid = False
                 if value == password:
                     password_nonvalid = False
-                    self.to_main()
+                    self.to_user_main()
                     return
         
         if username_nonvalid:
@@ -62,10 +66,15 @@ class Login(QMainWindow):
             self.alert('Your input password is wrong!')
         
         
-    def to_main(self):
+    def to_user_main(self):
         self.login_page.close()
-        self.main_page = UserMain()
-        self.main_page.show()
+        self.user_main_page = UserMain()
+        self.user_main_page.show()
+    
+    def to_admin_main(self):
+        self.login_page.close()
+        self.to_admin_main_page = AdminMain()
+        self.to_admin_main_page.show()
 
     def alert(self, text):
         alert = QMessageBox(self)

@@ -1,5 +1,5 @@
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QPushButton, QScrollArea, QWidget, QFrame, QGridLayout, QVBoxLayout
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QScrollArea, QWidget, QFrame, QGridLayout, QVBoxLayout, QHBoxLayout
 from PyQt5.QtGui import QPixmap, QColor, QIcon
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import Qt, QSize, QRect
@@ -78,19 +78,51 @@ class SparepartMenu(QWidget):
     def __init__(self):
         super().__init__()
         
-        self.ref = db.reference('/Sparepart/MotorCycle')
+        self.ref = db.reference('/Sparepart/Car')
         # Create a QScrollArea
+        self.set_scroll()
+
+
+
+
+
+    def button_clicked(self, index, increment, name):
+        self.counters[index] += increment
+        label = self.findChild(QLabel, f'label_{index}')
+        if label is not None:
+            label.setText("     " + str(self.counters[index]))
+        for key, value in self.ref.get().items():
+            if key == name:
+                hold = value['stock'] - increment
+                self.ref.child(key).update({'stock':hold})
+        total_quantity = sum(self.counters[1:])
+        total_price = sum(self.counters[i] * float(data.get(list(data.keys())[0], {}).get('price')) for i, data in enumerate(self.list_data, start=1))
+
+        self.total_quantity.setText("          " + str(total_quantity))
+        self.total_price.setText("          " + str(total_price) + 'k')
+
+    def set_scroll(self):
         scroll_area = QScrollArea(self)
         scroll_area.setWidgetResizable(True)
 
-        # Create a QWidget for the content
         content_widget = QWidget()
         scroll_area.setWidget(content_widget)
+        scroll_area.verticalScrollBar().setStyleSheet("""
+            QScrollBar:vertical {
+                border: 2px solid #555555;
+                background: #999999;
+                width: 10px;
+                background-color: rgb(80, 80, 122);
+            }
+            QScrollBar::handle:vertical {
+                background: #555555;
+                min-height: 20px;
+                background-color: rgb(245, 154, 182);
+            }
+        """)
 
-        # Create a QGridLayout for the content widget
         content_layout = QGridLayout(content_widget)
 
-        # Create a list to keep track of the counters
         self.counters = []
         self.counters.append(0) 
 
@@ -110,8 +142,7 @@ class SparepartMenu(QWidget):
 
         i = 1
 
-        # Add widgets to the layout
-        for data in self.list_data:  # Add 20 labels for demonstration
+        for data in self.list_data:
             label = QLabel(list(data.keys())[0])
             content_layout.addWidget(label, i, 0)
             label.setStyleSheet("color: white;")
@@ -120,12 +151,10 @@ class SparepartMenu(QWidget):
             content_layout.addWidget(price, i, 1)
             price.setStyleSheet("color: white;")
 
-            # Create buttons for each label
             button_plus = QPushButton(f'+')
             content_layout.addWidget(button_plus, i, 2)
 
-            self.counters.append(0)  # Initialize counters
-
+            self.counters.append(0) 
             count = QLabel("     0")
             content_layout.addWidget(count, i, 3)
             count.setObjectName(f'label_{i}')
@@ -134,19 +163,27 @@ class SparepartMenu(QWidget):
             button_minus = QPushButton(f'-')
             content_layout.addWidget(button_minus, i, 4)
 
-            # Connect button signals to functions
-            button_plus.clicked.connect(lambda checked, idx=i: self.handle_button_click(idx, 1))
-            button_minus.clicked.connect(lambda checked, idx=i: self.handle_button_click(idx, -1))
+            button_plus.clicked.connect(lambda checked, index=i, name=list(data.keys())[0]: self.button_clicked(index, 1, name))
+            button_minus.clicked.connect(lambda checked, index=i, name=list(data.keys())[0]: self.button_clicked(index, -1, name))
             i += 1
 
-        # Set the main layout for the window
         layout = QVBoxLayout(self)
-        layout.addWidget(scroll_area)
-        self.setLayout(layout)
+        layout.addWidget(scroll_area, 9)
+        Hbox = QWidget(self) 
+        Hbox_layout = QHBoxLayout(Hbox)  
+        self.quantity_label = QLabel("Total quantity")
+        self.quantity_label.setStyleSheet("color: white;")
+        Hbox_layout.addWidget(self.quantity_label)
+        self.total_quantity = QLabel("          0")
+        self.total_quantity.setStyleSheet("color: white;")
+        Hbox_layout.addWidget(self.total_quantity)
+        self.price_label = QLabel("Total price")
+        self.price_label.setStyleSheet("color: white;")
+        Hbox_layout.addWidget(self.price_label)
+        self.total_price = QLabel("          0")
+        self.total_price.setStyleSheet("color: white;")
+        Hbox_layout.addWidget(self.total_price)
 
-    def handle_button_click(self, index, increment):
-        # This function will be called when any button is clicked
-        self.counters[index] += increment
-        label = self.findChild(QLabel, f'label_{index}')  # Find the label by its object name
-        if label is not None:
-            label.setText("     " + str(self.counters[index]))
+        layout.addWidget(scroll_area, 9)
+        layout.addWidget(Hbox, 1) 
+        self.setLayout(layout)
