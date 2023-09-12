@@ -151,8 +151,8 @@ class SparepartMenu(QWidget):
             content_layout.addWidget(price, i, 1)
             price.setStyleSheet("color: white;")
 
-            button_plus = QPushButton(f'+')
-            content_layout.addWidget(button_plus, i, 2)
+            button_minus = QPushButton(f'-')
+            content_layout.addWidget(button_minus, i, 2)
 
             self.counters.append(0) 
             count = QLabel("     0")
@@ -160,8 +160,8 @@ class SparepartMenu(QWidget):
             count.setObjectName(f'label_{i}')
             count.setStyleSheet("color: white;")
 
-            button_minus = QPushButton(f'-')
-            content_layout.addWidget(button_minus, i, 4)
+            button_plus = QPushButton(f'+')
+            content_layout.addWidget(button_plus, i, 4)
 
             button_plus.clicked.connect(lambda checked, index=i, name=list(data.keys())[0]: self.button_clicked(index, 1, name))
             button_minus.clicked.connect(lambda checked, index=i, name=list(data.keys())[0]: self.button_clicked(index, -1, name))
