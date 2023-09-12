@@ -17,7 +17,7 @@
    <string notr="true">background-color: #2D2E43;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QComboBox" name="comboBox">
+   <widget class="QComboBox" name="Combobox">
     <property name="geometry">
      <rect>
       <x>30</x>

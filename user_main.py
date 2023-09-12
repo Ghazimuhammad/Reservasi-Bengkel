@@ -1,5 +1,5 @@
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QPushButton, QScrollArea, QWidget, QFrame, QGridLayout, QVBoxLayout, QHBoxLayout
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QScrollArea, QWidget, QFrame, QGridLayout, QVBoxLayout, QHBoxLayout, QComboBox
 from PyQt5.QtGui import QPixmap, QColor, QIcon
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import Qt, QSize, QRect
@@ -62,6 +62,10 @@ class Sparepart(QMainWindow):
         self.push_back.clicked.connect(self.to_user_main)
         self.insert_sparepart_menu()
 
+        self.sparepart_page.Combobox.addItem("Car")
+        self.sparepart_page.Combobox.addItem("MotorCycle")
+        self.sparepart_page.Combobox.currentIndexChanged.connect(self.insert_sparepart_menu)
+
         self.show()
 
     def to_user_main(self):
@@ -70,21 +74,27 @@ class Sparepart(QMainWindow):
         self.user_main.show()
     
     def insert_sparepart_menu(self):
-        scrollable_layout = SparepartMenu()
-        self.sparepart_page.verticalLayout.addWidget(scrollable_layout)
+        selected_item = self.sparepart_page.Combobox.currentText()
+    
+        if not selected_item:
+            for i in reversed(range(self.sparepart_page.verticalLayout.count())):
+                self.sparepart_page.verticalLayout.itemAt(i).widget().setParent(None)
+        else:
+            link = f"/Sparepart/{selected_item}"
+            scrollable_layout = SparepartMenu(link)
+
+            for i in reversed(range(self.sparepart_page.verticalLayout.count())):
+                self.sparepart_page.verticalLayout.itemAt(i).widget().setParent(None)
+            self.sparepart_page.verticalLayout.addWidget(scrollable_layout)
 
 
 class SparepartMenu(QWidget):
-    def __init__(self):
+    def __init__(self, link):
         super().__init__()
         
-        self.ref = db.reference('/Sparepart/Car')
-        # Create a QScrollArea
+        self.link = link
+        self.ref = db.reference(self.link)
         self.set_scroll()
-
-
-
-
 
     def button_clicked(self, index, increment, name):
         self.counters[index] += increment
