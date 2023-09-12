@@ -3,6 +3,9 @@ from PyQt5.QtWidgets import QMainWindow, QPushButton, QScrollArea, QWidget, QFra
 from PyQt5.QtGui import QPixmap, QColor, QIcon
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import Qt, QSize, QRect
+import firebase_admin
+from firebase_admin import db
+from cred import *
 
 class UserMain(QMainWindow):
     def __init__(self):
@@ -74,7 +77,8 @@ class Sparepart(QMainWindow):
 class SparepartMenu(QWidget):
     def __init__(self):
         super().__init__()
-
+        
+        self.ref = db.reference('/Sparepart/MotorCycle')
         # Create a QScrollArea
         scroll_area = QScrollArea(self)
         scroll_area.setWidgetResizable(True)
@@ -88,14 +92,33 @@ class SparepartMenu(QWidget):
 
         # Create a list to keep track of the counters
         self.counters = []
+        self.counters.append(0) 
+
+        self.list_data = [{key:value} for key, value in self.ref.get().items()]
+
+        label_name = QLabel('Name')
+        content_layout.addWidget(label_name, 0, 0)
+        label_name.setStyleSheet("color: white;")
+
+        label_price = QLabel('Price')
+        content_layout.addWidget(label_price, 0, 1)
+        label_price.setStyleSheet("color: white;")
+
+        label_count = QLabel("Count")
+        content_layout.addWidget(label_count, 0, 3)
+        label_count.setStyleSheet("color: white;")
+
+        i = 1
 
         # Add widgets to the layout
-        for i in range(20):  # Add 20 labels for demonstration
-            label = QLabel(f'Label {i+1}')
+        for data in self.list_data:  # Add 20 labels for demonstration
+            label = QLabel(list(data.keys())[0])
             content_layout.addWidget(label, i, 0)
+            label.setStyleSheet("color: white;")
 
-            price = QLabel(f'10k')
+            price = QLabel(str(data.get(list(data.keys())[0], {}).get('price')) + 'k')
             content_layout.addWidget(price, i, 1)
+            price.setStyleSheet("color: white;")
 
             # Create buttons for each label
             button_plus = QPushButton(f'+')
@@ -103,9 +126,10 @@ class SparepartMenu(QWidget):
 
             self.counters.append(0)  # Initialize counters
 
-            count = QLabel("0")
+            count = QLabel("     0")
             content_layout.addWidget(count, i, 3)
             count.setObjectName(f'label_{i}')
+            count.setStyleSheet("color: white;")
 
             button_minus = QPushButton(f'-')
             content_layout.addWidget(button_minus, i, 4)
@@ -113,6 +137,7 @@ class SparepartMenu(QWidget):
             # Connect button signals to functions
             button_plus.clicked.connect(lambda checked, idx=i: self.handle_button_click(idx, 1))
             button_minus.clicked.connect(lambda checked, idx=i: self.handle_button_click(idx, -1))
+            i += 1
 
         # Set the main layout for the window
         layout = QVBoxLayout(self)
@@ -124,4 +149,4 @@ class SparepartMenu(QWidget):
         self.counters[index] += increment
         label = self.findChild(QLabel, f'label_{index}')  # Find the label by its object name
         if label is not None:
-            label.setText(str(self.counters[index]))
+            label.setText("     " + str(self.counters[index]))
