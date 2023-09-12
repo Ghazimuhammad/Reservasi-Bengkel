@@ -17,36 +17,6 @@
    <string notr="true">background-color: #2D2E43;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QComboBox" name="Combobox">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>130</y>
-      <width>421</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">/* QCOMBOBOX */
-QComboBox {
-    background-color: #F59AB6;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    padding: 5px 10px;
-}
-
-QComboBox:hover {
-    background-color: rgb(186, 117, 139);
-}
-
-QComboBox:pressed {
-    background-color: rgb(109, 68, 81);
-}
-
-color: rgb(255, 255, 255);</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="push_back">
     <property name="geometry">
      <rect>
@@ -98,7 +68,7 @@ color: rgb(255, 255, 255);</string>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt; color:#ffffff;&quot;&gt;Daftar Sparepart&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt; color:#ffffff;&quot;&gt;Confirmation&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QLabel" name="logo_sparepart">
@@ -118,14 +88,14 @@ color: rgb(255, 255, 255);</string>
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>170</y>
+      <y>110</y>
       <width>421</width>
-      <height>381</height>
+      <height>441</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout"/>
    </widget>
-   <widget class="QPushButton" name="push_next">
+   <widget class="QPushButton" name="push_back_2">
     <property name="geometry">
      <rect>
       <x>290</x>
@@ -163,7 +133,7 @@ QPushButton:pressed {
 color: rgb(255, 255, 255);</string>
     </property>
     <property name="text">
-     <string>Next</string>
+     <string>Buy</string>
     </property>
    </widget>
   </widget>

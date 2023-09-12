@@ -18,24 +18,24 @@ ref_motor = db.reference('/Sparepart/MotorCycle')
 
 # ref_mobil = db.reference('/Sparepart/Car')
 
-# data_mobil = {
-#     'Tire': {'price': 150, 'stock': 100},
-#     'V Belt': {'price': 120, 'stock': 100},
-#     'Spark Plug': {'price': 70, 'stock': 100},
-#     'Filter': {'price': 50, 'stock': 100},
-#     'Battery': {'price': 80, 'stock': 100},
-#     'Clutch Plate': {'price': 100, 'stock': 100},
-#     'Machine Oil': {'price': 55, 'stock': 100},
-#     'Brake Canvas': {'price': 100, 'stock': 100},
-#     'Car Bumper': {'price': 170, 'stock': 100},
-#     'Wiper': {'price': 100, 'stock': 100},
-#     'Rearview Mirror': {'price': 225, 'stock': 100},
-#     'Filter Dryer': {'price': 125, 'stock': 100}
-# }
+data_mobil = {
+    'Tire': {'price': 150, 'stock': 100},
+    'V Belt': {'price': 120, 'stock': 100},
+    'Spark Plug': {'price': 70, 'stock': 100},
+    'Filter': {'price': 50, 'stock': 100},
+    'Battery': {'price': 80, 'stock': 100},
+    'Clutch Plate': {'price': 100, 'stock': 100},
+    'Machine Oil': {'price': 55, 'stock': 100},
+    'Brake Canvas': {'price': 100, 'stock': 100},
+    'Car Bumper': {'price': 170, 'stock': 100},
+    'Wiper': {'price': 100, 'stock': 100},
+    'Rearview Mirror': {'price': 225, 'stock': 100},
+    'Filter Dryer': {'price': 125, 'stock': 100}
+}
 
 # ref_motor.set(data_motor)
 # ref_mobil.set(data_mobil)
 
 data = ref_motor.get()
-list_data = [{key:value} for key, value in data.items()]
-print(list_data[0])
+lis = [{key:value} for key, value in data_mobil.items()]
+print(lis)

@@ -1,4 +1,5 @@
-from PyQt5 import uic
+import typing
+from PyQt5 import QtCore, uic
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QScrollArea, QWidget, QFrame, QGridLayout, QVBoxLayout, QHBoxLayout, QComboBox
 from PyQt5.QtGui import QPixmap, QColor, QIcon
 from PyQt5.QtWidgets import QLabel
@@ -60,11 +61,12 @@ class Sparepart(QMainWindow):
 
         self.push_back = self.findChild(QPushButton, 'push_back')
         self.push_back.clicked.connect(self.to_user_main)
-        self.insert_sparepart_menu()
 
         self.sparepart_page.Combobox.addItem("Car")
         self.sparepart_page.Combobox.addItem("MotorCycle")
         self.sparepart_page.Combobox.currentIndexChanged.connect(self.insert_sparepart_menu)
+
+        self.sparepart_page.push_next.clicked.connect(self.to_confirmation)
 
         self.show()
 
@@ -72,6 +74,12 @@ class Sparepart(QMainWindow):
         self.sparepart_page.close()
         self.user_main = UserMain()
         self.user_main.show()
+
+    def to_confirmation(self):
+        self.sparepart_page.close()
+        self.confirmation_page = Confirmation(self.scrollable_layout.get_data_buy())
+        self.confirmation_page.show()
+        # print(self.scrollable_layout.get_data_buy())
     
     def insert_sparepart_menu(self):
         selected_item = self.sparepart_page.Combobox.currentText()
@@ -81,19 +89,39 @@ class Sparepart(QMainWindow):
                 self.sparepart_page.verticalLayout.itemAt(i).widget().setParent(None)
         else:
             link = f"/Sparepart/{selected_item}"
-            scrollable_layout = SparepartMenu(link)
+            self.scrollable_layout = SparepartWidget(link)
 
             for i in reversed(range(self.sparepart_page.verticalLayout.count())):
                 self.sparepart_page.verticalLayout.itemAt(i).widget().setParent(None)
-            self.sparepart_page.verticalLayout.addWidget(scrollable_layout)
+            self.sparepart_page.verticalLayout.addWidget(self.scrollable_layout)
+    
 
 
-class SparepartMenu(QWidget):
+class Confirmation(QMainWindow):
+    def __init__(self, data):
+        super(Confirmation, self).__init__()
+        self.confirmation_page = uic.loadUi('file_ui/shopping_cart.ui', self)
+        self.data = data
+        self.confirmation_widget = ConfirmationWidget(data)
+        
+        # Assuming that "verticalLayout" is a layout in "shopping_cart.ui"
+        self.confirmation_page.verticalLayout.addWidget(self.confirmation_widget)
+        self.confirmation_page.push_back.clicked.connect(self.to_sparepart)
+
+        self.show()
+
+    def to_sparepart(self):
+        self.confirmation_page.close()
+        self.sparepart_page = Sparepart()
+        self.sparepart_page.show()
+
+class SparepartWidget(QWidget):
     def __init__(self, link):
         super().__init__()
         
         self.link = link
-        self.ref = db.reference(self.link)
+        self.data = db.reference(self.link).get()
+        self.data_buy = {}
         self.set_scroll()
 
     def button_clicked(self, index, increment, name):
@@ -101,15 +129,21 @@ class SparepartMenu(QWidget):
         label = self.findChild(QLabel, f'label_{index}')
         if label is not None:
             label.setText("     " + str(self.counters[index]))
-        for key, value in self.ref.get().items():
+        for key, value in self.data.items():
             if key == name:
                 hold = value['stock'] - increment
-                self.ref.child(key).update({'stock':hold})
+                db.reference(self.link).child(key).update({'stock':hold})
         total_quantity = sum(self.counters[1:])
         total_price = sum(self.counters[i] * float(data.get(list(data.keys())[0], {}).get('price')) for i, data in enumerate(self.list_data, start=1))
-
+        self.data_buy.update({'Total': {'Total quantity': total_quantity, 'Total price': total_price}})
+        self.data_buy.update({name: {'quantity': self.counters[index], 'price': self.counters[index] * self.data[name]['price']}})
+        if self.data_buy[name]['quantity'] == 0:
+            del self.data_buy[name]
         self.total_quantity.setText("          " + str(total_quantity))
         self.total_price.setText("          " + str(total_price) + 'k')
+    
+    def get_data_buy(self):
+        return self.data_buy
 
     def set_scroll(self):
         scroll_area = QScrollArea(self)
@@ -136,7 +170,7 @@ class SparepartMenu(QWidget):
         self.counters = []
         self.counters.append(0) 
 
-        self.list_data = [{key:value} for key, value in self.ref.get().items()]
+        self.list_data = [{key:value} for key, value in self.data.items()]
 
         label_name = QLabel('Name')
         content_layout.addWidget(label_name, 0, 0)
@@ -197,3 +231,59 @@ class SparepartMenu(QWidget):
         layout.addWidget(scroll_area, 9)
         layout.addWidget(Hbox, 1) 
         self.setLayout(layout)
+
+class ConfirmationWidget(QWidget):
+    def __init__(self, data):
+        super().__init__()
+        self.total_quantity = data['Total']['Total quantity']
+        self.total_price = data['Total']['Total price']
+        del data['Total']
+        self.data = [{key:value} for key, value in data.items()]
+
+        self.resume()
+
+    def resume(self):
+        content_layout = QGridLayout()
+
+        label_name = QLabel('Name')
+        content_layout.addWidget(label_name, 0, 0)
+        label_name.setStyleSheet("color: white;")
+
+        label_price = QLabel('Quantity')
+        content_layout.addWidget(label_price, 0, 1)
+        label_price.setStyleSheet("color: white;")
+
+        label_count = QLabel("Price")
+        content_layout.addWidget(label_count, 0, 2)
+        label_count.setStyleSheet("color: white;")
+
+        i = 1
+
+        for data in self.data:
+            label = QLabel(list(data.keys())[0])
+            content_layout.addWidget(label, i, 0)
+            label.setStyleSheet("color: white;")
+
+            quantity = QLabel(str(data.get(list(data.keys())[0], {}).get('quantity')))
+            content_layout.addWidget(quantity, i, 1)
+            quantity.setStyleSheet("color: white;")
+
+            price = QLabel(str(data.get(list(data.keys())[0], {}).get('price')) + 'k')
+            content_layout.addWidget(price, i, 2)
+            price.setStyleSheet("color: white;")
+
+            i += 1
+
+        label = QLabel('Total')
+        content_layout.addWidget(label, i, 0)
+        label.setStyleSheet("color: white;")
+
+        quantity = QLabel(str(self.total_quantity))
+        content_layout.addWidget(quantity, i, 1)
+        quantity.setStyleSheet("color: white;")
+
+        price = QLabel(str(self.total_price))
+        content_layout.addWidget(price, i, 2)
+        price.setStyleSheet("color: white;")
+
+        self.setLayout(content_layout)
