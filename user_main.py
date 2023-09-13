@@ -159,8 +159,10 @@ class Confirmation(QMainWindow):
         )
 
         if response.status_code == 200:
-            pdf_content = response.content
-            self.save_pdf(response.content, "output.pdf")
+            pdf_content = json.loads(response.content)['download_url']
+            response_content = requests.get(pdf_content)
+            with open('invoice.pdf', 'wb') as file:
+                file.write(response_content.content)
             return pdf_content
         else:
             print(f"Error: {response.status_code}")
@@ -176,6 +178,7 @@ class SparepartWidget(QWidget):
         self.set_scroll()
 
     def button_clicked(self, index, increment, name):
+        check = 0
         self.counters[index] += increment
         label = self.findChild(QLabel, f'label_{index}')
         if label is not None:
@@ -186,7 +189,16 @@ class SparepartWidget(QWidget):
                 db.reference(self.link).child(key).update({'stock':hold})
         self.total_quantity_buy = sum(self.counters[1:])
         self.total_price_buy = sum(self.counters[i] * float(data.get(list(data.keys())[0], {}).get('price')) for i, data in enumerate(self.list_data, start=1))
-        self.data_buy.append({'name': name, 'quantity': self.counters[index], 'price': self.data[name]['price'], 'total': self.counters[index] * self.data[name]['price']})
+        for data in self.data_buy:
+            if name == data['name']:
+                data['quantity'] = self.counters[index]
+                check = 1
+                break
+        if check == 0:
+            self.data_buy.append({'name': name, 'quantity': self.counters[index], 'price': self.data[name]['price'], 'total': self.counters[index] * self.data[name]['price']})
+            check = 1
+
+        print(self.data_buy)
         self.total_quantity.setText("          " + str(self.total_quantity_buy))
         self.total_price.setText("          " + str(self.total_price_buy) + 'k')
     
