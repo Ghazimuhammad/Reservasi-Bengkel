@@ -1,11 +1,12 @@
 import typing
 from PyQt5 import QtCore, uic
-from PyQt5.QtWidgets import QMainWindow, QPushButton, QScrollArea, QWidget, QFrame, QGridLayout, QVBoxLayout, QHBoxLayout, QComboBox
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QScrollArea, QWidget, QFrame, QGridLayout, QVBoxLayout, QHBoxLayout, QComboBox, QTableWidget, QTableWidgetItem, QSizePolicy, QHeaderView
 from PyQt5.QtGui import QPixmap, QColor, QIcon
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import Qt, QSize, QRect
 import firebase_admin
 from firebase_admin import db
+import requests, json
 from cred import *
 
 class UserMain(QMainWindow):
@@ -103,17 +104,67 @@ class Confirmation(QMainWindow):
         self.confirmation_page = uic.loadUi('file_ui/shopping_cart.ui', self)
         self.data = data
         self.confirmation_widget = ConfirmationWidget(data)
-        
-        # Assuming that "verticalLayout" is a layout in "shopping_cart.ui"
-        self.confirmation_page.verticalLayout.addWidget(self.confirmation_widget)
+
+        self.confirmation_page.verticalLayout.addWidget(self.confirmation_widget) 
+
+        self.confirmation_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.confirmation_page.push_back.clicked.connect(self.to_sparepart)
 
+        self.confirmation_page.push_buy.clicked.connect(self.get_pdf)
+
         self.show()
+
 
     def to_sparepart(self):
         self.confirmation_page.close()
         self.sparepart_page = Sparepart()
         self.sparepart_page.show()
+
+    def save_pdf(self, content, filename):
+        with open(filename, 'wb') as f:
+            f.write(content)
+
+
+    def get_pdf(self):
+        data_buy = self.data
+        
+
+        api_key = "a4b8MTQ4NzU6MTE5NTM6VHREamhxTExBSW5tQ3VPbA="
+        template_id = "efc77b23aef49cee"
+
+        data = {
+                "brand_name": "CMech Service",
+                "invoice_no": "123 456789",
+                "invoice_date": "01 / 10 /2022  ",
+                "account_name": "Lorem Ipsum",
+                "bank_det": "Bank Masyarakat Sejahtera",
+                "company_name": "CMech Service",
+                "street_address": "24 Los Angeles, India",
+                "items":None,
+                "terms" : "Lorem ipsum dolor sit, amet consectetur",
+                "conditions" : "ipsum dolor sit, amet consectetur",
+                "tel1": "+123 456 7890",
+                "tell2": "+777 500 5485",
+                "mail1": "sales@yourwebsite.com",
+                "mail2": "support@yourwebsite.com",
+                "address": "Lorem ipsum-40"
+                }
+        data['items'] = data_buy
+        print(data)
+
+        response = requests.post(
+            F"https://rest.apitemplate.io/v2/create-pdf?template_id={template_id}",
+            headers = {"X-API-KEY": F"{api_key}"},
+            json = data
+        )
+
+        if response.status_code == 200:
+            pdf_content = response.content
+            self.save_pdf(response.content, "output.pdf")
+            return pdf_content
+        else:
+            print(f"Error: {response.status_code}")
+            return None
 
 class SparepartWidget(QWidget):
     def __init__(self, link):
@@ -121,7 +172,7 @@ class SparepartWidget(QWidget):
         
         self.link = link
         self.data = db.reference(self.link).get()
-        self.data_buy = {}
+        self.data_buy = []
         self.set_scroll()
 
     def button_clicked(self, index, increment, name):
@@ -133,16 +184,17 @@ class SparepartWidget(QWidget):
             if key == name:
                 hold = value['stock'] - increment
                 db.reference(self.link).child(key).update({'stock':hold})
-        total_quantity = sum(self.counters[1:])
-        total_price = sum(self.counters[i] * float(data.get(list(data.keys())[0], {}).get('price')) for i, data in enumerate(self.list_data, start=1))
-        self.data_buy.update({'Total': {'Total quantity': total_quantity, 'Total price': total_price}})
-        self.data_buy.update({name: {'quantity': self.counters[index], 'price': self.counters[index] * self.data[name]['price']}})
-        if self.data_buy[name]['quantity'] == 0:
-            del self.data_buy[name]
-        self.total_quantity.setText("          " + str(total_quantity))
-        self.total_price.setText("          " + str(total_price) + 'k')
+        self.total_quantity_buy = sum(self.counters[1:])
+        self.total_price_buy = sum(self.counters[i] * float(data.get(list(data.keys())[0], {}).get('price')) for i, data in enumerate(self.list_data, start=1))
+        self.data_buy.append({'name': name, 'quantity': self.counters[index], 'price': self.data[name]['price'], 'total': self.counters[index] * self.data[name]['price']})
+        self.total_quantity.setText("          " + str(self.total_quantity_buy))
+        self.total_price.setText("          " + str(self.total_price_buy) + 'k')
     
     def get_data_buy(self):
+        self.data_buy.append({'Total quantity': self.total_quantity_buy, 'Total price': self.total_price_buy})
+        for i in range(len(self.data_buy) - 1):
+            if self.data_buy[i]['quantity'] == 0:
+                del self.data_buy[i]
         return self.data_buy
 
     def set_scroll(self):
@@ -235,55 +287,63 @@ class SparepartWidget(QWidget):
 class ConfirmationWidget(QWidget):
     def __init__(self, data):
         super().__init__()
-        self.total_quantity = data['Total']['Total quantity']
-        self.total_price = data['Total']['Total price']
-        del data['Total']
-        self.data = [{key:value} for key, value in data.items()]
+        self.total_quantity = data[-1]['Total quantity']
+        self.total_price = data[-1]['Total price']
+        del data[-1]
+        # self.data = [{key:value} for key, value in data.items()]
+        self.data = data
 
         self.resume()
 
     def resume(self):
         content_layout = QGridLayout()
-
-        label_name = QLabel('Name')
-        content_layout.addWidget(label_name, 0, 0)
-        label_name.setStyleSheet("color: white;")
-
-        label_price = QLabel('Quantity')
-        content_layout.addWidget(label_price, 0, 1)
-        label_price.setStyleSheet("color: white;")
-
-        label_count = QLabel("Price")
-        content_layout.addWidget(label_count, 0, 2)
-        label_count.setStyleSheet("color: white;")
-
-        i = 1
+        table = QTableWidget(len(self.data), 3)
+        table.setHorizontalHeaderLabels(['Name', 'Quantity', 'Price'])
+        i = 0
 
         for data in self.data:
-            label = QLabel(list(data.keys())[0])
-            content_layout.addWidget(label, i, 0)
-            label.setStyleSheet("color: white;")
 
-            quantity = QLabel(str(data.get(list(data.keys())[0], {}).get('quantity')))
-            content_layout.addWidget(quantity, i, 1)
-            quantity.setStyleSheet("color: white;")
+            item1 = QTableWidgetItem(f"{data['name']}")
+            table.setItem(i, 0, item1)
 
-            price = QLabel(str(data.get(list(data.keys())[0], {}).get('price')) + 'k')
-            content_layout.addWidget(price, i, 2)
-            price.setStyleSheet("color: white;")
+            item2 = QTableWidgetItem(" " * 12 + f"{data['quantity']}")
+            table.setItem(i, 1, item2)
+
+            item3 = QTableWidgetItem(" " * 12 + str(data['price']) + 'k')
+            table.setItem(i, 2, item3)
+
 
             i += 1
+        
+        total = QTableWidgetItem('Total')
+        table.setItem(i, 0, total)
 
-        label = QLabel('Total')
-        content_layout.addWidget(label, i, 0)
-        label.setStyleSheet("color: white;")
+        total1 = QTableWidgetItem(" " * 12 + str(self.total_quantity))
+        table.setItem(i, 1, total1)
 
-        quantity = QLabel(str(self.total_quantity))
-        content_layout.addWidget(quantity, i, 1)
-        quantity.setStyleSheet("color: white;")
+        total2 = QTableWidgetItem(" " * 12 + str(self.total_price))
+        table.setItem(i, 2, total2)
+        
+        table.setShowGrid(True)
+        table.verticalHeader().setVisible(False)  # Hide vertical header
+        table.setEditTriggers(QTableWidget.NoEditTriggers)  # Disable cell editing
 
-        price = QLabel(str(self.total_price))
-        content_layout.addWidget(price, i, 2)
-        price.setStyleSheet("color: white;")
+        layout = QVBoxLayout()
 
-        self.setLayout(content_layout)
+        # Add the QScrollArea to the layout
+        layout.addWidget(table)
+        self.setLayout(layout)
+
+        # label = QLabel('Total')
+        # content_layout.addWidget(label, i, 0)
+        # label.setStyleSheet("color: white;")
+
+        # quantity = QLabel(" " * 5 + str(self.total_quantity))
+        # content_layout.addWidget(quantity, i, 1)
+        # quantity.setStyleSheet("color: white;")
+
+        # price = QLabel(str(self.total_price) + 'k')
+        # content_layout.addWidget(price, i, 2)
+        # price.setStyleSheet("color: white;")
+
+        # self.setLayout(content_layout)
