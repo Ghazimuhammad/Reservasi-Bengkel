@@ -15,7 +15,7 @@ class Login(QMainWindow):
     def __init__(self):
         super(Login, self).__init__()
 
-        self.ref = db.reference('/Login')
+        self.ref = db.reference('/Account')
         self.database_login = self.ref.get()
         self.login_page = uic.loadUi('file_ui/login.ui', self)
 
@@ -40,9 +40,19 @@ class Login(QMainWindow):
         self.show()
 
     def to_create_account(self):
-        self.login_page.close()
-        self.signup_page = Signup(self)
-        self.signup_page.show()
+        self.navigate_to(Signup())
+
+    def to_user_main(self):
+        self.navigate_to(UserMain())
+
+    def to_admin_main(self):
+        self.navigate_to(AdminMain())
+
+    def navigate_to(self, window):
+        if hasattr(self, 'login_page'):
+            self.login_page.close()
+        self.window = window
+        self.window.show()
 
     def verify_login(self):
         username = self.username.text()
@@ -69,16 +79,6 @@ class Login(QMainWindow):
             self.password.clear()
             self.alert('Your input password is wrong!')
 
-    def to_user_main(self):
-        self.login_page.close()
-        self.user_main_page = UserMain()
-        self.user_main_page.show()
-
-    def to_admin_main(self):
-        self.login_page.close()
-        self.to_admin_main_page = AdminMain()
-        self.to_admin_main_page.show()
-
     def alert(self, text):
         alert = QMessageBox(self)
         alert.setWindowTitle('Alert!')
@@ -99,7 +99,7 @@ class Signup(QMainWindow):
 
         self.parent = parent  # Store the parent window
 
-        self.ref = db.reference('/Login')
+        self.ref = db.reference('/Account')
         self.database_login = self.ref.get()
 
         self.signup_page = uic.loadUi('file_ui/signup.ui', self)

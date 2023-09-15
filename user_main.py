@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (QMainWindow, QPushButton, QScrollArea,
                              QLabel, QLineEdit, QComboBox, 
                              QGridLayout, QSizePolicy, QVBoxLayout,
                              QHBoxLayout, QTableWidget, QTableWidgetItem,
-                             QWidget, QMessageBox)
+                             QWidget, QMessageBox, QDateTimeEdit)
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import QSize
 
@@ -131,11 +131,15 @@ class ReservationMenu(QMainWindow):
         self.reservation_page.type_input.addItem("Motorcycle")
         self.reservation_page.type_input.currentIndexChanged.connect(self.insert_type)
         self.reservation_page.push_back.clicked.connect(self.to_user_main)
+        self.reservation_page.date_input.editingFinished.connect(self.get_date)
 
     def to_user_main(self):
         if hasattr(self, 'reservation_page'):
             self.reservation_page.close()
         self.user_main = UserMain().show()
+
+    def get_date(self):
+        self.date_time = self.reservation_page.date_input.dateTime().date()
 
     def insert_type(self):
         selected_type = self.reservation_page.type_input.currentText()
@@ -146,9 +150,16 @@ class ReservationMenu(QMainWindow):
             list_service.append(service)
         for i in reversed(range(self.reservation_page.horizontalLayout.count())):
             self.reservation_page.horizontalLayout.itemAt(i).widget().setParent(None)
-        combo = QComboBox(self)
-        combo.addItems(list_service)
-        self.reservation_page.horizontalLayout.addWidget(combo)
+        self.combo = QComboBox(self)
+        self.combo.addItems(list_service)
+        self.reservation_page.horizontalLayout.addWidget(self.combo)
+        self.selected_service = self.combo.currentText()
+
+    def booking(self):
+        
+
+        pass
+
 
 
 
