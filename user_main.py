@@ -5,12 +5,12 @@ from PyQt5.QtWidgets import (QMainWindow, QPushButton, QScrollArea,
                              QLabel, QLineEdit, QComboBox, 
                              QGridLayout, QSizePolicy, QVBoxLayout,
                              QHBoxLayout, QTableWidget, QTableWidgetItem,
-                             QWidget)
+                             QWidget, QMessageBox)
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import QSize
 
 from firebase_admin import db
-from cred import cred_obj, default_app
+from cred import *
 
 
 
@@ -311,11 +311,20 @@ class SparepartWidget(QWidget):
 
     def button_clicked(self, index, increment, name):
         check = 0
+        current_data = db.reference(self.link).get()
         self.counters[index] += increment
         label = self.findChild(QLabel, f'label_{index}')
+        if self.counters[index] < 0:
+            self.alert("Quantity cannot be negatif!")
+            return
+
+        if current_data[name]['stock'] == 0:
+            self.alert("Out of stock!")
+            return
+
         if label is not None:
             label.setText(" " * 5 + str(self.counters[index]))
-        for key, value in self.data.items():
+        for key, value in current_data.items():
             if key == name:
                 hold = value['stock'] - increment
                 db.reference(self.link).child(key).update({'stock':hold})
@@ -330,9 +339,17 @@ class SparepartWidget(QWidget):
             self.data_buy.append({'name': name, 'quantity': self.counters[index], 'price': self.data[name]['price'], 'total': self.counters[index] * self.data[name]['price']})
             check = 1
 
-        print(self.data_buy)
         self.total_quantity.setText(" " * 10 + str(self.total_quantity_buy))
         self.total_price.setText(" " * 10 + str(self.total_price_buy) + 'k')
+
+    def alert(self, text):
+        alert = QMessageBox(self)
+        alert.setWindowTitle('Alert!')
+        alert.setText(text)
+        alert.setIcon(QMessageBox.Warning)
+        button = alert.exec()
+        if button == QMessageBox.Ok:
+            pass
     
     def get_data_buy(self):
         self.data_buy.append({'Total quantity': self.total_quantity_buy, 'Total price': self.total_price_buy})
