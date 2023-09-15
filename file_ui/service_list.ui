@@ -98,7 +98,7 @@ color: rgb(255, 255, 255);</string>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt; color:#ffffff;&quot;&gt;Sparepart List&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt; color:#ffffff;&quot;&gt;Service LIst&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QLabel" name="logo_sparepart">
@@ -124,47 +124,6 @@ color: rgb(255, 255, 255);</string>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout"/>
-   </widget>
-   <widget class="QPushButton" name="push_next">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>570</y>
-      <width>159</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Roboto Slab</family>
-      <pointsize>9</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">/* PUSH BUTTON */
-QPushButton {
-    background-color: rgb(80, 80, 122);
-    color: white;
-    border: none;
-    border-radius: 7px;
-    padding: 10px 20px;
-}
-
-QPushButton:hover {
-	background-color: rgb(245, 154, 182);
-}
-
-QPushButton:pressed {
-    background-color: rgb(109, 68, 81);
-}
-
-color: rgb(255, 255, 255);</string>
-    </property>
-    <property name="text">
-     <string>Next</string>
-    </property>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>

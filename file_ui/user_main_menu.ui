@@ -17,46 +17,6 @@
    <string notr="true">background-color: #2D2E43;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="push_my_booking">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>560</y>
-      <width>221</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Roboto Slab</family>
-      <pointsize>18</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
-      <underline>true</underline>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QPushButton {
-    background-color: #2D2E43;
-    color: white;
-    border: none;
-	border: none;
-    border-radius: 7px;
-    padding: 10px 20px;
-}
-
-QPushButton:hover {
-	background-color: rgb(91, 93, 136);
-}
-
-QPushButton:pressed {
-	background-color: rgb(127, 130, 189);
-}</string>
-    </property>
-    <property name="text">
-     <string>My Booking</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_user">
     <property name="geometry">
      <rect>
@@ -396,6 +356,47 @@ color: rgb(255, 255, 255);</string>
     </property>
     <property name="text">
      <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="push_back">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>570</y>
+      <width>159</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Slab</family>
+      <pointsize>9</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">/* PUSH BUTTON */
+QPushButton {
+    background-color: rgb(80, 80, 122);
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 20px;
+}
+
+QPushButton:hover {
+	background-color: rgb(245, 154, 182);
+}
+
+QPushButton:pressed {
+    background-color: rgb(109, 68, 81);
+}
+
+color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string>My Booking</string>
     </property>
    </widget>
   </widget>

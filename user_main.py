@@ -1,7 +1,7 @@
 import typing
 from PyQt5 import QtCore, uic
-from PyQt5.QtWidgets import QMainWindow, QPushButton, QScrollArea, QWidget, QFrame, QGridLayout, QVBoxLayout, QHBoxLayout, QComboBox, QTableWidget, QTableWidgetItem, QSizePolicy, QHeaderView, QLineEdit
-from PyQt5.QtGui import QPixmap, QColor, QIcon
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QScrollArea, QWidget, QFrame, QGridLayout, QVBoxLayout, QHBoxLayout, QComboBox, QTableWidget, QTableWidgetItem, QSizePolicy, QHeaderView, QLineEdit, QTextEdit
+from PyQt5.QtGui import QPixmap, QColor, QIcon, QFontMetrics
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import Qt, QSize, QRect
 import firebase_admin
@@ -23,6 +23,8 @@ class UserMain(QMainWindow):
 
         self.main_page.push_reservation.clicked.connect(self.to_reservation)
 
+        self.main_page.push_service_list.clicked.connect(self.to_service_list)
+
         self.show()
 
     def to_sparepart(self):
@@ -34,6 +36,11 @@ class UserMain(QMainWindow):
         self.main_page.close()
         self.reservation_page = Reservation()
         self.reservation_page.show()
+
+    def to_service_list(self):
+        self.main_page.close()
+        self.service_list_page = ServiceList()
+        self.service_list_page.show()
     
     def set_icon(self):
         self.label = self.findChild(QLabel, 'logo')
@@ -120,12 +127,12 @@ class Reservation(QMainWindow):
         self.reservation_page.type_input.addItem("Car")
         self.reservation_page.type_input.addItem("MotorCycle")
         self.reservation_page.type_input.currentIndexChanged.connect(self.insert_type)
-
+        selected_type = self.reservation_page.type_input.currentText()
+        self.insert_type(selected_type)
 
         self.show()
 
-    def insert_type(self):
-        selected_type = self.reservation_page.type_input.currentText()
+    def insert_type(self, text):
         combo = QComboBox(self)
         combo.addItem("Paket 1")
         combo.addItem("Paket 2")
@@ -133,6 +140,108 @@ class Reservation(QMainWindow):
 
         self.reservation_page.horizontalLayout.addWidget(combo)
 
+
+
+class ServiceList(QMainWindow):
+    def __init__(self):
+        super(ServiceList, self).__init__()
+        self.servicelist_page = uic.loadUi('file_ui/service_list.ui', self)
+
+        self.servicelist_page.push_back.clicked.connect(self.to_user_main)
+
+
+        self.servicelist_page.Combobox.addItem("Car")
+        self.servicelist_page.Combobox.addItem("MotorCycle")
+        self.beginning = True
+        if self.beginning:
+            self.link = '/ServiceList/Car'
+            self.scrollable_layout = self.list_service()
+            self.servicelist_page.verticalLayout.addWidget(self.scrollable_layout)
+            self.beginning = False
+        self.servicelist_page.Combobox.currentIndexChanged.connect(self.get_choice)
+        self.servicelist_page.verticalLayout.addWidget(self.list_service())
+
+        self.show()
+
+    def to_user_main(self):
+        self.servicelist_page.close()
+        self.user_main_page = UserMain()
+        self.user_main_page.show()
+
+    def get_choice(self):
+        selected_item = self.servicelist_page.Combobox.currentText()
+        self.link = f"/Sparepart/{selected_item}"
+
+    def list_service(self):
+        for i in reversed(range(self.servicelist_page.verticalLayout.count())):
+            self.servicelist_page.verticalLayout.itemAt(i).widget().setParent(None)
+        scroll_area = QScrollArea(self)
+        scroll_area.setWidgetResizable(True)
+
+        content_widget = QWidget()
+        scroll_area.setWidget(content_widget)
+        scroll_area.verticalScrollBar().setStyleSheet("""
+            QScrollBar:vertical {
+                border: 2px solid #555555;
+                background: #999999;
+                width: 10px;
+                background-color: rgb(80, 80, 122);
+            }
+            QScrollBar::handle:vertical {
+                background: #555555;
+                min-height: 20px;
+                background-color: rgb(245, 154, 182);
+            }
+        """)
+
+        content_layout = QGridLayout(content_widget)
+        
+        self.ref = db.reference(self.link)
+        data = self.ref.get()
+
+        label_no = QLabel('No.')
+        content_layout.addWidget(label_no, 0, 0)
+        label_no.setStyleSheet("color: white;")
+
+        label_name = QLabel('Name')
+        content_layout.addWidget(label_name, 0, 1)
+        label_name.setStyleSheet("color: white;")
+
+        label_desk = QLabel("Description")
+        content_layout.addWidget(label_desk, 0, 2)
+        label_desk.setStyleSheet("color: white;")
+
+        label_price = QLabel("Price")
+        content_layout.addWidget(label_price, 0, 3)
+        label_price.setStyleSheet("color: white;")
+
+        i = 1
+
+        for key, value in data.items():
+            number = QLabel(str(i))
+            content_layout.addWidget(number, i, 0)
+            number.setStyleSheet("color: white;")
+            number.setFixedHeight(50)
+
+            name = QLabel(key)
+            content_layout.addWidget(name, i, 1)
+            name.setStyleSheet("color: white;")
+            name.setFixedHeight(50)
+
+            desk = QLabel(value['description'])
+            desk.setWordWrap(True)
+            content_layout.addWidget(desk, i, 2)
+            desk.setStyleSheet("color: white;")
+            desk.setFixedHeight(150)
+
+            price = QLabel(str(value['price']) + 'k')
+            content_layout.addWidget(price, i, 3)
+            price.setStyleSheet("color: white;")
+            price.setFixedHeight(50)
+            i += 1
+            content_layout.setRowMinimumHeight(i, 200)
+
+        return scroll_area
 
 
 
