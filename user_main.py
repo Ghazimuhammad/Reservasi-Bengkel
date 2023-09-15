@@ -168,15 +168,12 @@ class ServiceList(QMainWindow):
         self.user_main_page.show()
 
     def get_activated(self):
-        for i in reversed(range(self.servicelist_page.verticalLayout.count())):
-            self.servicelist_page.verticalLayout.itemAt(i).widget().setParent(None)
-        self.get_choice()
-        self.servicelist_page.verticalLayout.addWidget(self.list_service())
-
-    def get_choice(self):
         selected_item = self.servicelist_page.Combobox.currentText()
         self.link = f"/ServiceList/{selected_item}"
-        
+        for i in reversed(range(self.servicelist_page.verticalLayout.count())):
+            self.servicelist_page.verticalLayout.itemAt(i).widget().setParent(None)
+        self.servicelist_page.verticalLayout.addWidget(self.list_service())
+
 
     def list_service(self):
         scroll_area = QScrollArea(self)
