@@ -1,13 +1,16 @@
-import typing
-from PyQt5 import QtCore, uic
-from PyQt5.QtWidgets import QMainWindow, QPushButton, QScrollArea, QWidget, QFrame, QGridLayout, QVBoxLayout, QHBoxLayout, QComboBox, QTableWidget, QTableWidgetItem, QSizePolicy, QHeaderView, QLineEdit, QTextEdit
-from PyQt5.QtGui import QPixmap, QColor, QIcon, QFontMetrics
-from PyQt5.QtWidgets import QLabel
-from PyQt5.QtCore import Qt, QSize, QRect
-import firebase_admin
+import json, requests
+
+from PyQt5 import uic
+from PyQt5.QtWidgets import (QMainWindow, QPushButton, QScrollArea, 
+                             QLabel, QLineEdit, QComboBox, 
+                             QGridLayout, QSizePolicy, QVBoxLayout,
+                             QHBoxLayout, QTableWidget, QTableWidgetItem,
+                             QWidget)
+from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtCore import QSize
+
 from firebase_admin import db
-import requests, json
-from cred import *
+from cred import cred_obj, default_app
 
 class UserMain(QMainWindow):
     def __init__(self):
