@@ -151,15 +151,14 @@ class ServiceList(QMainWindow):
 
 
         self.servicelist_page.Combobox.addItem("Car")
-        self.servicelist_page.Combobox.addItem("MotorCycle")
+        self.servicelist_page.Combobox.addItem("Motorcycle")
         self.beginning = True
         if self.beginning:
             self.link = '/ServiceList/Car'
             self.scrollable_layout = self.list_service()
             self.servicelist_page.verticalLayout.addWidget(self.scrollable_layout)
             self.beginning = False
-        self.servicelist_page.Combobox.currentIndexChanged.connect(self.get_choice)
-        self.servicelist_page.verticalLayout.addWidget(self.list_service())
+        self.servicelist_page.Combobox.currentIndexChanged.connect(self.get_activated)
 
         self.show()
 
@@ -168,13 +167,18 @@ class ServiceList(QMainWindow):
         self.user_main_page = UserMain()
         self.user_main_page.show()
 
-    def get_choice(self):
-        selected_item = self.servicelist_page.Combobox.currentText()
-        self.link = f"/Sparepart/{selected_item}"
-
-    def list_service(self):
+    def get_activated(self):
         for i in reversed(range(self.servicelist_page.verticalLayout.count())):
             self.servicelist_page.verticalLayout.itemAt(i).widget().setParent(None)
+        self.get_choice()
+        self.servicelist_page.verticalLayout.addWidget(self.list_service())
+
+    def get_choice(self):
+        selected_item = self.servicelist_page.Combobox.currentText()
+        self.link = f"/ServiceList/{selected_item}"
+        
+
+    def list_service(self):
         scroll_area = QScrollArea(self)
         scroll_area.setWidgetResizable(True)
 
