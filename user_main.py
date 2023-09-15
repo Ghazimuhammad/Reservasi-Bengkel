@@ -35,7 +35,7 @@ class UserMain(QMainWindow):
         self.navigate_to(ReservationMenu())
 
     def to_service_list(self):
-        self.navigate_to(ServiceList())
+        self.navigate_to(ServiceListMenu())
     
     def navigate_to(self, window):
         if hasattr(self, 'main_page'):
@@ -118,32 +118,43 @@ class SparepartMenu(QMainWindow):
 class ReservationMenu(QMainWindow):
     def __init__(self):
         super(ReservationMenu, self).__init__()
+        self.setup_ui()
+
+        self.show()
+    
+    def setup_ui(self):
         self.reservation_page = uic.loadUi('file_ui/reservation.ui', self)
 
         self.name = self.findChild(QLineEdit, 'name_input')
         self.handphone = self.findChild(QLineEdit, 'phone_input')
-        # self.date = self.date_input.dateTime()
         self.reservation_page.type_input.addItem("Car")
-        self.reservation_page.type_input.addItem("MotorCycle")
+        self.reservation_page.type_input.addItem("Motorcycle")
         self.reservation_page.type_input.currentIndexChanged.connect(self.insert_type)
+        self.reservation_page.push_back.clicked.connect(self.to_user_main)
+
+    def to_user_main(self):
+        if hasattr(self, 'reservation_page'):
+            self.reservation_page.close()
+        self.user_main = UserMain().show()
+
+    def insert_type(self):
         selected_type = self.reservation_page.type_input.currentText()
-        self.insert_type(selected_type)
-
-        self.show()
-
-    def insert_type(self, text):
+        link = f"/ServiceList/{selected_type}"
+        services = db.reference(link).get()
+        list_service = []
+        for service in services.keys():
+            list_service.append(service)
+        for i in reversed(range(self.reservation_page.horizontalLayout.count())):
+            self.reservation_page.horizontalLayout.itemAt(i).widget().setParent(None)
         combo = QComboBox(self)
-        combo.addItem("Paket 1")
-        combo.addItem("Paket 2")
-        combo.addItem("Paket 3")
-
+        combo.addItems(list_service)
         self.reservation_page.horizontalLayout.addWidget(combo)
 
 
 
-class ServiceList(QMainWindow):
+class ServiceListMenu(QMainWindow):
     def __init__(self):
-        super(ServiceList, self).__init__()
+        super(ServiceListMenu, self).__init__()
         self.setup_ui()
 
         self.show()
