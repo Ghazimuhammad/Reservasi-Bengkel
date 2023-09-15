@@ -1,6 +1,6 @@
 import typing
 from PyQt5 import QtCore, uic
-from PyQt5.QtWidgets import QMainWindow, QPushButton, QScrollArea, QWidget, QFrame, QGridLayout, QVBoxLayout, QHBoxLayout, QComboBox, QTableWidget, QTableWidgetItem, QSizePolicy, QHeaderView
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QScrollArea, QWidget, QFrame, QGridLayout, QVBoxLayout, QHBoxLayout, QComboBox, QTableWidget, QTableWidgetItem, QSizePolicy, QHeaderView, QLineEdit
 from PyQt5.QtGui import QPixmap, QColor, QIcon
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtCore import Qt, QSize, QRect
@@ -21,12 +21,19 @@ class UserMain(QMainWindow):
         self.create_account = self.findChild(QPushButton, 'push_sparepart')
         self.create_account.clicked.connect(self.to_sparepart)
 
+        self.main_page.push_reservation.clicked.connect(self.to_reservation)
+
         self.show()
 
     def to_sparepart(self):
         self.main_page.close()
         self.sparepart_page = Sparepart()
         self.sparepart_page.show()
+
+    def to_reservation(self):
+        self.main_page.close()
+        self.reservation_page = Reservation()
+        self.reservation_page.show()
     
     def set_icon(self):
         self.label = self.findChild(QLabel, 'logo')
@@ -48,6 +55,9 @@ class UserMain(QMainWindow):
 
 
 
+
+
+
     
 class Sparepart(QMainWindow):
     def __init__(self):
@@ -65,6 +75,11 @@ class Sparepart(QMainWindow):
 
         self.sparepart_page.Combobox.addItem("Car")
         self.sparepart_page.Combobox.addItem("MotorCycle")
+        self.beginning = True
+        if self.beginning:
+            self.scrollable_layout = SparepartWidget('/Sparepart/Car')
+            self.sparepart_page.verticalLayout.addWidget(self.scrollable_layout)
+            self.beginning = False
         self.sparepart_page.Combobox.currentIndexChanged.connect(self.insert_sparepart_menu)
 
         self.sparepart_page.push_next.clicked.connect(self.to_confirmation)
@@ -84,18 +99,42 @@ class Sparepart(QMainWindow):
     
     def insert_sparepart_menu(self):
         selected_item = self.sparepart_page.Combobox.currentText()
+        self.link = f"/Sparepart/{selected_item}"
+        for i in reversed(range(self.sparepart_page.verticalLayout.count())):
+            self.sparepart_page.verticalLayout.itemAt(i).widget().setParent(None)
+        self.scrollable_layout = SparepartWidget(self.link)
+        self.sparepart_page.verticalLayout.addWidget(self.scrollable_layout)
     
-        if not selected_item:
-            for i in reversed(range(self.sparepart_page.verticalLayout.count())):
-                self.sparepart_page.verticalLayout.itemAt(i).widget().setParent(None)
-        else:
-            link = f"/Sparepart/{selected_item}"
-            self.scrollable_layout = SparepartWidget(link)
 
-            for i in reversed(range(self.sparepart_page.verticalLayout.count())):
-                self.sparepart_page.verticalLayout.itemAt(i).widget().setParent(None)
-            self.sparepart_page.verticalLayout.addWidget(self.scrollable_layout)
-    
+
+
+
+class Reservation(QMainWindow):
+    def __init__(self):
+        super(Reservation, self).__init__()
+        self.reservation_page = uic.loadUi('file_ui/reservation.ui', self)
+
+        self.name = self.findChild(QLineEdit, 'name_input')
+        self.handphone = self.findChild(QLineEdit, 'phone_input')
+        # self.date = self.date_input.dateTime()
+        self.reservation_page.type_input.addItem("Car")
+        self.reservation_page.type_input.addItem("MotorCycle")
+        self.reservation_page.type_input.currentIndexChanged.connect(self.insert_type)
+
+
+        self.show()
+
+    def insert_type(self):
+        selected_type = self.reservation_page.type_input.currentText()
+        combo = QComboBox(self)
+        combo.addItem("Paket 1")
+        combo.addItem("Paket 2")
+        combo.addItem("Paket 3")
+
+        self.reservation_page.horizontalLayout.addWidget(combo)
+
+
+
 
 
 class Confirmation(QMainWindow):
@@ -167,6 +206,11 @@ class Confirmation(QMainWindow):
         else:
             print(f"Error: {response.status_code}")
             return None
+        
+
+
+
+
 
 class SparepartWidget(QWidget):
     def __init__(self, link):
@@ -182,7 +226,7 @@ class SparepartWidget(QWidget):
         self.counters[index] += increment
         label = self.findChild(QLabel, f'label_{index}')
         if label is not None:
-            label.setText("     " + str(self.counters[index]))
+            label.setText(" " * 5 + str(self.counters[index]))
         for key, value in self.data.items():
             if key == name:
                 hold = value['stock'] - increment
@@ -199,8 +243,8 @@ class SparepartWidget(QWidget):
             check = 1
 
         print(self.data_buy)
-        self.total_quantity.setText("          " + str(self.total_quantity_buy))
-        self.total_price.setText("          " + str(self.total_price_buy) + 'k')
+        self.total_quantity.setText(" " * 10 + str(self.total_quantity_buy))
+        self.total_price.setText(" " * 10 + str(self.total_price_buy) + 'k')
     
     def get_data_buy(self):
         self.data_buy.append({'Total quantity': self.total_quantity_buy, 'Total price': self.total_price_buy})
@@ -296,6 +340,10 @@ class SparepartWidget(QWidget):
         layout.addWidget(Hbox, 1) 
         self.setLayout(layout)
 
+
+
+
+
 class ConfirmationWidget(QWidget):
     def __init__(self, data):
         super().__init__()
@@ -345,17 +393,3 @@ class ConfirmationWidget(QWidget):
         # Add the QScrollArea to the layout
         layout.addWidget(table)
         self.setLayout(layout)
-
-        # label = QLabel('Total')
-        # content_layout.addWidget(label, i, 0)
-        # label.setStyleSheet("color: white;")
-
-        # quantity = QLabel(" " * 5 + str(self.total_quantity))
-        # content_layout.addWidget(quantity, i, 1)
-        # quantity.setStyleSheet("color: white;")
-
-        # price = QLabel(str(self.total_price) + 'k')
-        # content_layout.addWidget(price, i, 2)
-        # price.setStyleSheet("color: white;")
-
-        # self.setLayout(content_layout)
