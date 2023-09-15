@@ -368,21 +368,13 @@ class SparepartWidget(QWidget):
 
         self.list_data = [{key:value} for key, value in self.data.items()]
 
-        label_no = QLabel('No. ')
-        content_layout.addWidget(label_no, 0, 0)
-        label_no.setStyleSheet("color: white;")
-
-        label_name = QLabel('Name')
-        content_layout.addWidget(label_name, 0, 1)
-        label_name.setStyleSheet("color: white;")
-
-        label_price = QLabel('Price')
-        content_layout.addWidget(label_price, 0, 2)
-        label_price.setStyleSheet("color: white;")
-
-        label_count = QLabel("Count")
-        content_layout.addWidget(label_count, 0, 4)
-        label_count.setStyleSheet("color: white;")
+        labels = ['No.', 'Name', 'Price', 'Count']
+        for i, label in enumerate(labels):
+            if i == 3:
+                i+= 1
+            header = QLabel(label)
+            header.setStyleSheet("color: white;")
+            content_layout.addWidget(header, 0, i)
 
         i = 1
 
@@ -422,13 +414,13 @@ class SparepartWidget(QWidget):
         self.quantity_label = QLabel("Total quantity")
         self.quantity_label.setStyleSheet("color: white;")
         Hbox_layout.addWidget(self.quantity_label)
-        self.total_quantity = QLabel("          0")
+        self.total_quantity = QLabel(" " * 10 + "0")
         self.total_quantity.setStyleSheet("color: white;")
         Hbox_layout.addWidget(self.total_quantity)
         self.price_label = QLabel("Total price")
         self.price_label.setStyleSheet("color: white;")
         Hbox_layout.addWidget(self.price_label)
-        self.total_price = QLabel("          0")
+        self.total_price = QLabel(" " * 10 + "0")
         self.total_price.setStyleSheet("color: white;")
         Hbox_layout.addWidget(self.total_price)
 
@@ -446,7 +438,6 @@ class ConfirmationWidget(QWidget):
         self.total_quantity = data[-1]['Total quantity']
         self.total_price = data[-1]['Total price']
         del data[-1]
-        # self.data = [{key:value} for key, value in data.items()]
         self.data = data
 
         self.resume()
