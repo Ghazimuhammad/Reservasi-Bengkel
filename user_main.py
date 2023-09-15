@@ -12,38 +12,36 @@ from PyQt5.QtCore import QSize
 from firebase_admin import db
 from cred import cred_obj, default_app
 
+
+
 class UserMain(QMainWindow):
     def __init__(self):
         super(UserMain, self).__init__()
-
-        self.main_page = uic.loadUi('file_ui/user_main_menu.ui', self)
-
-        
+        self.setup_ui()
         self.set_icon()
-
-        self.create_account = self.findChild(QPushButton, 'push_sparepart')
-        self.create_account.clicked.connect(self.to_sparepart)
-
-        self.main_page.push_reservation.clicked.connect(self.to_reservation)
-
-        self.main_page.push_service_list.clicked.connect(self.to_service_list)
-
         self.show()
 
+    def setup_ui(self):
+        self.main_page = uic.loadUi('file_ui/user_main_menu.ui', self)
+        self.create_account = self.findChild(QPushButton, 'push_sparepart')
+        self.create_account.clicked.connect(self.to_sparepart)
+        self.main_page.push_reservation.clicked.connect(self.to_reservation)
+        self.main_page.push_service_list.clicked.connect(self.to_service_list)
+
     def to_sparepart(self):
-        self.main_page.close()
-        self.sparepart_page = Sparepart()
-        self.sparepart_page.show()
+        self.navigate_to(SparepartMenu())
 
     def to_reservation(self):
-        self.main_page.close()
-        self.reservation_page = Reservation()
-        self.reservation_page.show()
+        self.navigate_to(ReservationMenu())
 
     def to_service_list(self):
-        self.main_page.close()
-        self.service_list_page = ServiceList()
-        self.service_list_page.show()
+        self.navigate_to(ServiceList())
+    
+    def navigate_to(self, window):
+        if hasattr(self, 'main_page'):
+            self.main_page.close()
+        self.window = window
+        self.window.show()
     
     def set_icon(self):
         self.label = self.findChild(QLabel, 'logo')
@@ -69,59 +67,57 @@ class UserMain(QMainWindow):
 
 
     
-class Sparepart(QMainWindow):
+class SparepartMenu(QMainWindow):
     def __init__(self):
-        super(Sparepart, self).__init__()
+        super(SparepartMenu, self).__init__()
 
-        self.sparepart_page = uic.loadUi('file_ui/sparepart_menu.ui', self)
-
+        self.setup_ui()
+        self.show()
+    
+    def setup_ui(self):
+        self.sparepart_menu = uic.loadUi('file_ui/sparepart_menu.ui', self)
         self.label = self.findChild(QLabel, 'logo_sparepart')
         pixmap = QPixmap('Pictures/sparepart.png')
         self.label.setPixmap(pixmap)
         self.label.setScaledContents(True)
-
-        self.push_back = self.findChild(QPushButton, 'push_back')
-        self.push_back.clicked.connect(self.to_user_main)
-
-        self.sparepart_page.Combobox.addItem("Car")
-        self.sparepart_page.Combobox.addItem("MotorCycle")
+        self.sparepart_menu.push_back.clicked.connect(self.to_user_main)
+        self.sparepart_menu.Combobox.addItems(["Car", 'MotorCycle'])
         self.beginning = True
         if self.beginning:
             self.scrollable_layout = SparepartWidget('/Sparepart/Car')
-            self.sparepart_page.verticalLayout.addWidget(self.scrollable_layout)
+            self.sparepart_menu.verticalLayout.addWidget(self.scrollable_layout)
             self.beginning = False
-        self.sparepart_page.Combobox.currentIndexChanged.connect(self.insert_sparepart_menu)
+        self.sparepart_menu.Combobox.currentIndexChanged.connect(self.insert_sparepart_menu)
 
-        self.sparepart_page.push_next.clicked.connect(self.to_confirmation)
-
-        self.show()
+        self.sparepart_menu.push_next.clicked.connect(self.to_confirmation)
 
     def to_user_main(self):
-        self.sparepart_page.close()
-        self.user_main = UserMain()
-        self.user_main.show()
+        self.navigate_to(UserMain())
 
     def to_confirmation(self):
-        self.sparepart_page.close()
-        self.confirmation_page = Confirmation(self.scrollable_layout.get_data_buy())
-        self.confirmation_page.show()
-        # print(self.scrollable_layout.get_data_buy())
-    
+        self.navigate_to(ConfirmationPage(self.scrollable_layout.get_data_buy()))
+
+    def navigate_to(self, window):
+        if hasattr(self, 'sparepart_menu'):
+            self.sparepart_menu.close()
+        self.window = window
+        self.window.show()
+
     def insert_sparepart_menu(self):
-        selected_item = self.sparepart_page.Combobox.currentText()
+        selected_item = self.sparepart_menu.Combobox.currentText()
         self.link = f"/Sparepart/{selected_item}"
-        for i in reversed(range(self.sparepart_page.verticalLayout.count())):
-            self.sparepart_page.verticalLayout.itemAt(i).widget().setParent(None)
+        for i in reversed(range(self.sparepart_menu.verticalLayout.count())):
+            self.sparepart_menu.verticalLayout.itemAt(i).widget().setParent(None)
         self.scrollable_layout = SparepartWidget(self.link)
-        self.sparepart_page.verticalLayout.addWidget(self.scrollable_layout)
+        self.sparepart_menu.verticalLayout.addWidget(self.scrollable_layout)
     
 
 
 
 
-class Reservation(QMainWindow):
+class ReservationMenu(QMainWindow):
     def __init__(self):
-        super(Reservation, self).__init__()
+        super(ReservationMenu, self).__init__()
         self.reservation_page = uic.loadUi('file_ui/reservation.ui', self)
 
         self.name = self.findChild(QLineEdit, 'name_input')
@@ -148,34 +144,34 @@ class Reservation(QMainWindow):
 class ServiceList(QMainWindow):
     def __init__(self):
         super(ServiceList, self).__init__()
-        self.servicelist_page = uic.loadUi('file_ui/service_list.ui', self)
-
-        self.servicelist_page.push_back.clicked.connect(self.to_user_main)
-
-
-        self.servicelist_page.Combobox.addItem("Car")
-        self.servicelist_page.Combobox.addItem("Motorcycle")
-        self.beginning = True
-        if self.beginning:
-            self.link = '/ServiceList/Car'
-            self.scrollable_layout = self.list_service()
-            self.servicelist_page.verticalLayout.addWidget(self.scrollable_layout)
-            self.beginning = False
-        self.servicelist_page.Combobox.currentIndexChanged.connect(self.get_activated)
+        self.setup_ui()
 
         self.show()
 
+    def setup_ui(self):
+        self.servicelist_menu = uic.loadUi('file_ui/service_list.ui', self)
+        self.servicelist_menu.push_back.clicked.connect(self.to_user_main)
+        self.servicelist_menu.Combobox.addItems(["Car", 'Motorcycle'])
+        beginning = True
+        if beginning:
+            self.link = '/ServiceList/Car'
+            self.scrollable_layout = self.list_service()
+            self.servicelist_menu.verticalLayout.addWidget(self.scrollable_layout)
+            beginning = False
+        self.servicelist_menu.Combobox.currentIndexChanged.connect(self.get_activated)
+
     def to_user_main(self):
-        self.servicelist_page.close()
-        self.user_main_page = UserMain()
-        self.user_main_page.show()
+        if hasattr(self, 'servicelist_menu'):
+            self.servicelist_menu.close()
+        self.user_main = UserMain()
+        self.user_main.show()
 
     def get_activated(self):
-        selected_item = self.servicelist_page.Combobox.currentText()
+        selected_item = self.servicelist_menu.Combobox.currentText()
         self.link = f"/ServiceList/{selected_item}"
-        for i in reversed(range(self.servicelist_page.verticalLayout.count())):
-            self.servicelist_page.verticalLayout.itemAt(i).widget().setParent(None)
-        self.servicelist_page.verticalLayout.addWidget(self.list_service())
+        for i in reversed(range(self.servicelist_menu.verticalLayout.count())):
+            self.servicelist_menu.verticalLayout.itemAt(i).widget().setParent(None)
+        self.servicelist_menu.verticalLayout.addWidget(self.list_service())
 
 
     def list_service(self):
@@ -203,59 +199,42 @@ class ServiceList(QMainWindow):
         self.ref = db.reference(self.link)
         data = self.ref.get()
 
-        label_no = QLabel('No.')
-        content_layout.addWidget(label_no, 0, 0)
-        label_no.setStyleSheet("color: white;")
+        labels = ['No.', 'Name', 'Description', 'Price']
 
-        label_name = QLabel('Name')
-        content_layout.addWidget(label_name, 0, 1)
-        label_name.setStyleSheet("color: white;")
+        for i, label in enumerate(labels):
+            label = QLabel(label)
+            label.setStyleSheet("color: white;")
+            content_layout.addWidget(label, 0, i)
 
-        label_desk = QLabel("Description")
-        content_layout.addWidget(label_desk, 0, 2)
-        label_desk.setStyleSheet("color: white;")
-
-        label_price = QLabel("Price")
-        content_layout.addWidget(label_price, 0, 3)
-        label_price.setStyleSheet("color: white;")
-
-        i = 1
-
-        for key, value in data.items():
-            number = QLabel(str(i))
-            content_layout.addWidget(number, i, 0)
-            number.setStyleSheet("color: white;")
-            number.setFixedHeight(50)
-
-            name = QLabel(key)
-            content_layout.addWidget(name, i, 1)
-            name.setStyleSheet("color: white;")
-            name.setFixedHeight(50)
-
-            desk = QLabel(value['description'])
-            desk.setWordWrap(True)
-            content_layout.addWidget(desk, i, 2)
-            desk.setStyleSheet("color: white;")
-            desk.setFixedHeight(150)
-
-            price = QLabel(str(value['price']) + 'k')
-            content_layout.addWidget(price, i, 3)
-            price.setStyleSheet("color: white;")
-            price.setFixedHeight(50)
-            i += 1
-            content_layout.setRowMinimumHeight(i, 200)
+        for i, (key, value) in enumerate(data.items(), start = 1):
+            row_data = [i, key, value['description'], f"{value['price']}k"]
+            for j, item in enumerate(row_data):
+                label = QLabel(str(item))
+                label.setStyleSheet("color: white;")
+                if item == value['description']:
+                    label.setWordWrap(True)
+                    label.setFixedHeight(100)
+                else:
+                    label.setFixedHeight(50)
+                content_layout.addWidget(label, i, j)
+            content_layout.setRowMinimumHeight(i, 120)
 
         return scroll_area
 
 
 
 
-class Confirmation(QMainWindow):
+class ConfirmationPage(QMainWindow):
     def __init__(self, data):
-        super(Confirmation, self).__init__()
-        self.confirmation_page = uic.loadUi('file_ui/shopping_cart.ui', self)
+        super(ConfirmationPage, self).__init__()
         self.data = data
-        self.confirmation_widget = ConfirmationWidget(data)
+        self.init_ui()
+
+        self.show()
+
+    def init_ui(self):
+        self.confirmation_page = uic.loadUi('file_ui/shopping_cart.ui', self)
+        self.confirmation_widget = ConfirmationWidget(self.data)
 
         self.confirmation_page.verticalLayout.addWidget(self.confirmation_widget) 
 
@@ -264,12 +243,11 @@ class Confirmation(QMainWindow):
 
         self.confirmation_page.push_buy.clicked.connect(self.get_pdf)
 
-        self.show()
-
 
     def to_sparepart(self):
-        self.confirmation_page.close()
-        self.sparepart_page = Sparepart()
+        if hasattr(self, 'confirmation_page'):
+            self.confirmation_page.close()
+        self.sparepart_page = SparepartMenu()
         self.sparepart_page.show()
 
     def save_pdf(self, content, filename):
@@ -320,9 +298,6 @@ class Confirmation(QMainWindow):
             print(f"Error: {response.status_code}")
             return None
         
-
-
-
 
 
 class SparepartWidget(QWidget):
@@ -393,40 +368,48 @@ class SparepartWidget(QWidget):
 
         self.list_data = [{key:value} for key, value in self.data.items()]
 
+        label_no = QLabel('No. ')
+        content_layout.addWidget(label_no, 0, 0)
+        label_no.setStyleSheet("color: white;")
+
         label_name = QLabel('Name')
-        content_layout.addWidget(label_name, 0, 0)
+        content_layout.addWidget(label_name, 0, 1)
         label_name.setStyleSheet("color: white;")
 
         label_price = QLabel('Price')
-        content_layout.addWidget(label_price, 0, 1)
+        content_layout.addWidget(label_price, 0, 2)
         label_price.setStyleSheet("color: white;")
 
         label_count = QLabel("Count")
-        content_layout.addWidget(label_count, 0, 3)
+        content_layout.addWidget(label_count, 0, 4)
         label_count.setStyleSheet("color: white;")
 
         i = 1
 
         for data in self.list_data:
+            number = QLabel(str(i))
+            number.setStyleSheet("color: white;")
+            content_layout.addWidget(number, i, 0)
+            
             label = QLabel(list(data.keys())[0])
-            content_layout.addWidget(label, i, 0)
+            content_layout.addWidget(label, i, 1)
             label.setStyleSheet("color: white;")
 
             price = QLabel(str(data.get(list(data.keys())[0], {}).get('price')) + 'k')
-            content_layout.addWidget(price, i, 1)
+            content_layout.addWidget(price, i, 2)
             price.setStyleSheet("color: white;")
 
             button_minus = QPushButton(f'-')
-            content_layout.addWidget(button_minus, i, 2)
+            content_layout.addWidget(button_minus, i, 3)
 
             self.counters.append(0) 
             count = QLabel("     0")
-            content_layout.addWidget(count, i, 3)
+            content_layout.addWidget(count, i, 4)
             count.setObjectName(f'label_{i}')
             count.setStyleSheet("color: white;")
 
             button_plus = QPushButton(f'+')
-            content_layout.addWidget(button_plus, i, 4)
+            content_layout.addWidget(button_plus, i, 5)
 
             button_plus.clicked.connect(lambda checked, index=i, name=list(data.keys())[0]: self.button_clicked(index, 1, name))
             button_minus.clicked.connect(lambda checked, index=i, name=list(data.keys())[0]: self.button_clicked(index, -1, name))
