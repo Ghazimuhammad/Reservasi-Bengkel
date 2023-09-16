@@ -1,11 +1,12 @@
 import json, requests
 from datetime import datetime
+import pandas as pd
 
 from PyQt5 import uic
 from PyQt5.QtWidgets import (QMainWindow, QPushButton, QScrollArea, 
                              QLabel, QLineEdit, QComboBox, 
                              QGridLayout, QSizePolicy,
-                             QWidget)
+                             QWidget, QMessageBox)
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import QSize, QDateTime, QTime
 from user_widget import SparepartWidget, ConfirmationWidget, custom_vertikal_bar, custom_horizontal_bar
@@ -267,7 +268,7 @@ class ConfirmationPage(QMainWindow):
         self.confirmation_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.confirmation_page.push_back.clicked.connect(self.to_sparepart)
 
-        self.confirmation_page.push_buy.clicked.connect(self.get_pdf)
+        self.confirmation_page.push_buy.clicked.connect(self.clicked_buy)
 
 
     def to_sparepart(self):
@@ -279,6 +280,44 @@ class ConfirmationPage(QMainWindow):
     def save_pdf(self, content, filename):
         with open(filename, 'wb') as f:
             f.write(content)
+
+    def clicked_buy(self):
+        self.get_pdf()
+        self.success_buy()
+        self.update_sales()
+        if hasattr(self, 'confirmation_page'):
+            self.confirmation_page.close()
+        UserMain(self.account).show()
+
+    def success_buy(self):
+        success = QMessageBox(self)
+        success.setWindowTitle('Thank You!')
+        success.setText("Your transaction has been successfull!")
+        success.setIcon(QMessageBox.Information)
+        button = success.exec()
+        if button == QMessageBox.Ok:
+            pass
+
+    def update_sales(self):
+        ref = db.reference("/Sales")
+        current_date = str(datetime.now().date())
+        data_temp = {}
+        for data in self.data:
+            data_temp.update({data['name']: {'quantity': data['quantity'], 'total': data['total']}})
+        data_previous = ref.get()
+
+        if current_date in data_previous.keys():
+            data_previous[current_date].update(data_temp)
+        else:
+            data_previous.update({current_date: data_temp})
+
+        data_sales = data_previous
+        try:
+            ref.update(data_sales)
+        except KeyError as e:
+            print(KeyError)
+        
+
 
 
     def get_pdf(self):
@@ -306,11 +345,9 @@ class ConfirmationPage(QMainWindow):
                 "address": "Lorem ipsum-40"
                 }
         data['items'] = data_buy
-        print(data)
-
         response = requests.post(
-            F"https://rest.apitemplate.io/v2/create-pdf?template_id={template_id}",
-            headers = {"X-API-KEY": F"{api_key}"},
+            f"https://rest.apitemplate.io/v2/create-pdf?template_id={template_id}",
+            headers = {"X-API-KEY": f"{api_key}"},
             json = data
         )
 

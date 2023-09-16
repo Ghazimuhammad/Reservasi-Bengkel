@@ -39,6 +39,7 @@ class SparepartWidget(QWidget):
         for data in self.data_buy:
             if name == data['name']:
                 data['quantity'] = self.counters[index]
+                data['total'] = data['quantity'] * data['price']
                 check = 1
                 break
         if check == 0:
