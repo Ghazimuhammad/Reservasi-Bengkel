@@ -4,12 +4,11 @@ from datetime import datetime
 from PyQt5 import uic
 from PyQt5.QtWidgets import (QMainWindow, QPushButton, QScrollArea, 
                              QLabel, QLineEdit, QComboBox, 
-                             QGridLayout, QSizePolicy, QVBoxLayout,
-                             QHBoxLayout, QTableWidget, QTableWidgetItem,
-                             QWidget, QMessageBox, QDateTimeEdit)
+                             QGridLayout, QSizePolicy,
+                             QWidget)
 from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtCore import QSize, QDate, QDateTime, QTime
-from user_widget import SparepartWidget, ConfirmationWidget
+from PyQt5.QtCore import QSize, QDateTime, QTime
+from user_widget import SparepartWidget, ConfirmationWidget, custom_vertikal_bar, custom_horizontal_bar
 
 from firebase_admin import db
 from cred import *
@@ -177,9 +176,6 @@ class ReservationMenu(QMainWindow):
         ref.update(data_booking)
 
 
-
-
-
 class ServiceListMenu(QMainWindow):
     def __init__(self, account):
         super(ServiceListMenu, self).__init__()
@@ -220,19 +216,8 @@ class ServiceListMenu(QMainWindow):
 
         content_widget = QWidget()
         scroll_area.setWidget(content_widget)
-        scroll_area.verticalScrollBar().setStyleSheet("""
-            QScrollBar:vertical {
-                border: 2px solid #555555;
-                background: #999999;
-                width: 10px;
-                background-color: rgb(80, 80, 122);
-            }
-            QScrollBar::handle:vertical {
-                background: #555555;
-                min-height: 20px;
-                background-color: rgb(245, 154, 182);
-            }
-        """)
+        scroll_area.verticalScrollBar().setStyleSheet(str(custom_vertikal_bar()))
+        scroll_area.horizontalScrollBar().setStyleSheet(str(custom_horizontal_bar()))
 
         content_layout = QGridLayout(content_widget)
         
@@ -363,19 +348,8 @@ class MyBookingPage(QMainWindow):
 
         content_widget = QWidget()
         scroll_area.setWidget(content_widget)
-        scroll_area.verticalScrollBar().setStyleSheet("""
-            QScrollBar:vertical {
-                border: 2px solid #555555;
-                background: #999999;
-                width: 10px;
-                background-color: rgb(80, 80, 122);
-            }
-            QScrollBar::handle:vertical {
-                background: #555555;
-                min-height: 20px;
-                background-color: rgb(245, 154, 182);
-            }
-        """)
+        scroll_area.verticalScrollBar().setStyleSheet(str(custom_vertikal_bar()))
+        scroll_area.horizontalScrollBar().setStyleSheet(str(custom_horizontal_bar()))
 
         content_layout = QGridLayout(content_widget)
 
@@ -408,10 +382,4 @@ class MyBookingPage(QMainWindow):
                 label.setStyleSheet("color: white;")
                 label.setFixedHeight(20)
                 content_layout.addWidget(label, i, j)
-        # content_layout.setColumnMaximumWidth(0, 30)  # Adjust as needed
-        # content_layout.setColumnMinimumWidth(1, 30)  # Adjust as needed
-
-        # Set minimum heights for rows
-        # for i in range(1, len(data) + 1):
-        #     content_layout.setRowMinimumHeight(i, 30)
         return scroll_area
