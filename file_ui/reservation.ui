@@ -168,7 +168,7 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; color:#ffffff;&quot;&gt;List Service&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="push_next">
+   <widget class="QPushButton" name="push_booking">
     <property name="geometry">
      <rect>
       <x>290</x>
@@ -214,7 +214,7 @@ color: rgb(255, 255, 255);</string>
      <rect>
       <x>30</x>
       <y>490</y>
-      <width>411</width>
+      <width>421</width>
       <height>31</height>
      </rect>
     </property>

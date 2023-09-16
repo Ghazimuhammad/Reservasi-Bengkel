@@ -1,4 +1,5 @@
 import json, requests
+from datetime import datetime
 
 from PyQt5 import uic
 from PyQt5.QtWidgets import (QMainWindow, QPushButton, QScrollArea, 
@@ -7,7 +8,8 @@ from PyQt5.QtWidgets import (QMainWindow, QPushButton, QScrollArea,
                              QHBoxLayout, QTableWidget, QTableWidgetItem,
                              QWidget, QMessageBox, QDateTimeEdit)
 from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, QDate, QDateTime, QTime
+from user_widget import SparepartWidget, ConfirmationWidget
 
 from firebase_admin import db
 from cred import *
@@ -15,8 +17,9 @@ from cred import *
 
 
 class UserMain(QMainWindow):
-    def __init__(self):
+    def __init__(self, account):
         super(UserMain, self).__init__()
+        self.account = account
         self.setup_ui()
         self.set_icon()
         self.show()
@@ -29,13 +32,13 @@ class UserMain(QMainWindow):
         self.main_page.push_service_list.clicked.connect(self.to_service_list)
 
     def to_sparepart(self):
-        self.navigate_to(SparepartMenu())
+        self.navigate_to(SparepartMenu(self.account))
 
     def to_reservation(self):
-        self.navigate_to(ReservationMenu())
+        self.navigate_to(ReservationMenu(self.account))
 
     def to_service_list(self):
-        self.navigate_to(ServiceListMenu())
+        self.navigate_to(ServiceListMenu(self.account))
     
     def navigate_to(self, window):
         if hasattr(self, 'main_page'):
@@ -64,13 +67,10 @@ class UserMain(QMainWindow):
 
 
 
-
-
-    
 class SparepartMenu(QMainWindow):
-    def __init__(self):
+    def __init__(self, account):
         super(SparepartMenu, self).__init__()
-
+        self.account = account
         self.setup_ui()
         self.show()
     
@@ -92,10 +92,10 @@ class SparepartMenu(QMainWindow):
         self.sparepart_menu.push_next.clicked.connect(self.to_confirmation)
 
     def to_user_main(self):
-        self.navigate_to(UserMain())
+        self.navigate_to(UserMain(self.account))
 
     def to_confirmation(self):
-        self.navigate_to(ConfirmationPage(self.scrollable_layout.get_data_buy()))
+        self.navigate_to(ConfirmationPage(self.scrollable_layout.get_data_buy(), self.account))
 
     def navigate_to(self, window):
         if hasattr(self, 'sparepart_menu'):
@@ -116,14 +116,16 @@ class SparepartMenu(QMainWindow):
 
 
 class ReservationMenu(QMainWindow):
-    def __init__(self):
+    def __init__(self, account):
         super(ReservationMenu, self).__init__()
+        self.account = account
         self.setup_ui()
 
         self.show()
     
     def setup_ui(self):
         self.reservation_page = uic.loadUi('file_ui/reservation.ui', self)
+        self.ref = db.reference("/Login")
 
         self.name = self.findChild(QLineEdit, 'name_input')
         self.handphone = self.findChild(QLineEdit, 'phone_input')
@@ -131,15 +133,23 @@ class ReservationMenu(QMainWindow):
         self.reservation_page.type_input.addItem("Motorcycle")
         self.reservation_page.type_input.currentIndexChanged.connect(self.insert_type)
         self.reservation_page.push_back.clicked.connect(self.to_user_main)
+        current_date = QDateTime.currentDateTime()
+        max_time = QTime(19, 59, 59)
+        self.reservation_page.date_input.setDateTime(current_date)
+        self.reservation_page.date_input.setMinimumDateTime(current_date)
+        self.reservation_page.date_input.setMaximumDateTime(QDateTime(current_date.date(), max_time))
         self.reservation_page.date_input.editingFinished.connect(self.get_date)
+        self.reservation_page.push_booking.clicked.connect(self.booking)
 
     def to_user_main(self):
         if hasattr(self, 'reservation_page'):
             self.reservation_page.close()
-        self.user_main = UserMain().show()
+        self.user_main = UserMain(self.account).show()
 
     def get_date(self):
-        self.date_time = self.reservation_page.date_input.dateTime().date()
+        date_time = self.reservation_page.date_input.dateTime().date()
+        date = date_time.toPyDate()
+        self.dt = datetime(date.year, date.month, date.day, date.hour, date.minute, date.second)
 
     def insert_type(self):
         selected_type = self.reservation_page.type_input.currentText()
@@ -153,19 +163,24 @@ class ReservationMenu(QMainWindow):
         self.combo = QComboBox(self)
         self.combo.addItems(list_service)
         self.reservation_page.horizontalLayout.addWidget(self.combo)
-        self.selected_service = self.combo.currentText()
 
     def booking(self):
-        
+        ref = db.reference("/Booking")
+        self.selected_service = self.combo.currentText()
+        print(self.dt)
+        data_booking = {self.account: 
+                        {str(self.dt): {'service': self.selected_service
+                        }}}
+        ref.update(data_booking)
 
-        pass
 
 
 
 
 class ServiceListMenu(QMainWindow):
-    def __init__(self):
+    def __init__(self, account):
         super(ServiceListMenu, self).__init__()
+        self.account = account
         self.setup_ui()
 
         self.show()
@@ -185,7 +200,7 @@ class ServiceListMenu(QMainWindow):
     def to_user_main(self):
         if hasattr(self, 'servicelist_menu'):
             self.servicelist_menu.close()
-        self.user_main = UserMain()
+        self.user_main = UserMain(self.account)
         self.user_main.show()
 
     def get_activated(self):
@@ -247,9 +262,10 @@ class ServiceListMenu(QMainWindow):
 
 
 class ConfirmationPage(QMainWindow):
-    def __init__(self, data):
+    def __init__(self, data, account):
         super(ConfirmationPage, self).__init__()
         self.data = data
+        self.account = account
         self.init_ui()
 
         self.show()
@@ -269,7 +285,7 @@ class ConfirmationPage(QMainWindow):
     def to_sparepart(self):
         if hasattr(self, 'confirmation_page'):
             self.confirmation_page.close()
-        self.sparepart_page = SparepartMenu()
+        self.sparepart_page = SparepartMenu(self.account)
         self.sparepart_page.show()
 
     def save_pdf(self, content, filename):
@@ -320,202 +336,3 @@ class ConfirmationPage(QMainWindow):
             print(f"Error: {response.status_code}")
             return None
         
-
-
-class SparepartWidget(QWidget):
-    def __init__(self, link):
-        super().__init__()
-        
-        self.link = link
-        self.data = db.reference(self.link).get()
-        self.data_buy = []
-        self.set_scroll()
-
-    def button_clicked(self, index, increment, name):
-        check = 0
-        current_data = db.reference(self.link).get()
-        self.counters[index] += increment
-        label = self.findChild(QLabel, f'label_{index}')
-        if self.counters[index] < 0:
-            self.alert("Quantity cannot be negatif!")
-            return
-
-        if current_data[name]['stock'] == 0:
-            self.alert("Out of stock!")
-            return
-
-        if label is not None:
-            label.setText(" " * 5 + str(self.counters[index]))
-        for key, value in current_data.items():
-            if key == name:
-                hold = value['stock'] - increment
-                db.reference(self.link).child(key).update({'stock':hold})
-        self.total_quantity_buy = sum(self.counters[1:])
-        self.total_price_buy = sum(self.counters[i] * float(data.get(list(data.keys())[0], {}).get('price')) for i, data in enumerate(self.list_data, start=1))
-        for data in self.data_buy:
-            if name == data['name']:
-                data['quantity'] = self.counters[index]
-                check = 1
-                break
-        if check == 0:
-            self.data_buy.append({'name': name, 'quantity': self.counters[index], 'price': self.data[name]['price'], 'total': self.counters[index] * self.data[name]['price']})
-            check = 1
-
-        self.total_quantity.setText(" " * 10 + str(self.total_quantity_buy))
-        self.total_price.setText(" " * 10 + str(self.total_price_buy) + 'k')
-
-    def alert(self, text):
-        alert = QMessageBox(self)
-        alert.setWindowTitle('Alert!')
-        alert.setText(text)
-        alert.setIcon(QMessageBox.Warning)
-        button = alert.exec()
-        if button == QMessageBox.Ok:
-            pass
-    
-    def get_data_buy(self):
-        self.data_buy.append({'Total quantity': self.total_quantity_buy, 'Total price': self.total_price_buy})
-        for i in range(len(self.data_buy) - 1):
-            if self.data_buy[i]['quantity'] == 0:
-                del self.data_buy[i]
-        return self.data_buy
-
-    def set_scroll(self):
-        scroll_area = QScrollArea(self)
-        scroll_area.setWidgetResizable(True)
-
-        content_widget = QWidget()
-        scroll_area.setWidget(content_widget)
-        scroll_area.verticalScrollBar().setStyleSheet("""
-            QScrollBar:vertical {
-                border: 2px solid #555555;
-                background: #999999;
-                width: 10px;
-                background-color: rgb(80, 80, 122);
-            }
-            QScrollBar::handle:vertical {
-                background: #555555;
-                min-height: 20px;
-                background-color: rgb(245, 154, 182);
-            }
-        """)
-
-        content_layout = QGridLayout(content_widget)
-
-        self.counters = []
-        self.counters.append(0) 
-
-        self.list_data = [{key:value} for key, value in self.data.items()]
-
-        labels = ['No.', 'Name', 'Price', 'Count']
-        for i, label in enumerate(labels):
-            if i == 3:
-                i+= 1
-            header = QLabel(label)
-            header.setStyleSheet("color: white;")
-            content_layout.addWidget(header, 0, i)
-
-        i = 1
-
-        for data in self.list_data:
-            number = QLabel(str(i))
-            number.setStyleSheet("color: white;")
-            content_layout.addWidget(number, i, 0)
-            
-            label = QLabel(list(data.keys())[0])
-            content_layout.addWidget(label, i, 1)
-            label.setStyleSheet("color: white;")
-
-            price = QLabel(str(data.get(list(data.keys())[0], {}).get('price')) + 'k')
-            content_layout.addWidget(price, i, 2)
-            price.setStyleSheet("color: white;")
-
-            button_minus = QPushButton(f'-')
-            content_layout.addWidget(button_minus, i, 3)
-
-            self.counters.append(0) 
-            count = QLabel("     0")
-            content_layout.addWidget(count, i, 4)
-            count.setObjectName(f'label_{i}')
-            count.setStyleSheet("color: white;")
-
-            button_plus = QPushButton(f'+')
-            content_layout.addWidget(button_plus, i, 5)
-
-            button_plus.clicked.connect(lambda checked, index=i, name=list(data.keys())[0]: self.button_clicked(index, 1, name))
-            button_minus.clicked.connect(lambda checked, index=i, name=list(data.keys())[0]: self.button_clicked(index, -1, name))
-            i += 1
-
-        layout = QVBoxLayout(self)
-        layout.addWidget(scroll_area, 9)
-        Hbox = QWidget(self) 
-        Hbox_layout = QHBoxLayout(Hbox)  
-        self.quantity_label = QLabel("Total quantity")
-        self.quantity_label.setStyleSheet("color: white;")
-        Hbox_layout.addWidget(self.quantity_label)
-        self.total_quantity = QLabel(" " * 10 + "0")
-        self.total_quantity.setStyleSheet("color: white;")
-        Hbox_layout.addWidget(self.total_quantity)
-        self.price_label = QLabel("Total price")
-        self.price_label.setStyleSheet("color: white;")
-        Hbox_layout.addWidget(self.price_label)
-        self.total_price = QLabel(" " * 10 + "0")
-        self.total_price.setStyleSheet("color: white;")
-        Hbox_layout.addWidget(self.total_price)
-
-        layout.addWidget(scroll_area, 9)
-        layout.addWidget(Hbox, 1) 
-        self.setLayout(layout)
-
-
-
-
-
-class ConfirmationWidget(QWidget):
-    def __init__(self, data):
-        super().__init__()
-        self.total_quantity = data[-1]['Total quantity']
-        self.total_price = data[-1]['Total price']
-        del data[-1]
-        self.data = data
-
-        self.resume()
-
-    def resume(self):
-        content_layout = QGridLayout()
-        table = QTableWidget(len(self.data), 3)
-        table.setHorizontalHeaderLabels(['Name', 'Quantity', 'Price'])
-        i = 0
-
-        for data in self.data:
-
-            item1 = QTableWidgetItem(f"{data['name']}")
-            table.setItem(i, 0, item1)
-
-            item2 = QTableWidgetItem(" " * 12 + f"{data['quantity']}")
-            table.setItem(i, 1, item2)
-
-            item3 = QTableWidgetItem(" " * 12 + str(data['price']) + 'k')
-            table.setItem(i, 2, item3)
-
-
-            i += 1
-        
-        total = QTableWidgetItem('Total')
-        table.setItem(i, 0, total)
-
-        total1 = QTableWidgetItem(" " * 12 + str(self.total_quantity))
-        table.setItem(i, 1, total1)
-
-        total2 = QTableWidgetItem(" " * 12 + str(self.total_price))
-        table.setItem(i, 2, total2)
-        
-        table.setShowGrid(True)
-        table.verticalHeader().setVisible(False)  # Hide vertical header
-        table.setEditTriggers(QTableWidget.NoEditTriggers)  # Disable cell editing
-
-        layout = QVBoxLayout()
-
-        # Add the QScrollArea to the layout
-        layout.addWidget(table)
-        self.setLayout(layout)

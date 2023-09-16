@@ -358,7 +358,7 @@ color: rgb(255, 255, 255);</string>
      <string/>
     </property>
    </widget>
-   <widget class="QPushButton" name="push_back">
+   <widget class="QPushButton" name="push_mybooking">
     <property name="geometry">
      <rect>
       <x>30</x>

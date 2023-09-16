@@ -1,3 +1,7 @@
+import json
+from datetime import datetime
+import numpy as np
+
 import sys
 import re
 from PyQt5 import uic
@@ -23,7 +27,7 @@ class Login(QMainWindow):
 
     def init_widgets(self):
         self.username = self.findChild(QLineEdit, 'username_input')
-        self.username.setCompleter(QCompleter(['admin@gmail.com', 'halouser@gmail.com']))
+        self.username.setCompleter(QCompleter(['admin@gmail.com', 'user@gmail.com']))
         self.password = self.findChild(QLineEdit, 'password_input')
 
         self.create_account = self.findChild(QPushButton, 'push_create_account')
@@ -43,7 +47,7 @@ class Login(QMainWindow):
         self.navigate_to(Signup())
 
     def to_user_main(self):
-        self.navigate_to(UserMain())
+        self.navigate_to(UserMain(self.username.text().replace(".", "")))
 
     def to_admin_main(self):
         self.navigate_to(AdminMain())
@@ -94,10 +98,8 @@ class Login(QMainWindow):
 
 
 class Signup(QMainWindow):
-    def __init__(self, parent):
+    def __init__(self):
         super(Signup, self).__init__()
-
-        self.parent = parent  # Store the parent window
 
         self.ref = db.reference('/Account')
         self.database_login = self.ref.get()
@@ -120,8 +122,9 @@ class Signup(QMainWindow):
         self.show()
 
     def to_login(self):
-        self.signup_page.close()
-        self.parent.show()  # Show the parent window
+        if hasattr(self, 'signup_page'):
+            self.signup_page.close()
+        Login().show()
 
     def create_account(self):
         username = self.username_input.text()
@@ -153,7 +156,7 @@ class Signup(QMainWindow):
             data_hold = {username: password}
 
             if self.database_login is None:
-                self.ref.set({'admin@gmailcom': 'Haloadmin1234'})
+                self.ref.set({'admin@gmailcom': 'Admin1234'})
                 self.ref.update(data_hold)
             else:
                 self.ref.update(data_hold)
