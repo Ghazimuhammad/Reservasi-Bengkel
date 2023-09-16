@@ -30,6 +30,7 @@ class UserMain(QMainWindow):
         self.create_account.clicked.connect(self.to_sparepart)
         self.main_page.push_reservation.clicked.connect(self.to_reservation)
         self.main_page.push_service_list.clicked.connect(self.to_service_list)
+        self.main_page.push_mybooking.clicked.connect(self.to_my_booking)
 
     def to_sparepart(self):
         self.navigate_to(SparepartMenu(self.account))
@@ -39,6 +40,9 @@ class UserMain(QMainWindow):
 
     def to_service_list(self):
         self.navigate_to(ServiceListMenu(self.account))
+    
+    def to_my_booking(self):
+        self.navigate_to(MyBookingPage(self.account))
     
     def navigate_to(self, window):
         if hasattr(self, 'main_page'):
@@ -113,12 +117,11 @@ class SparepartMenu(QMainWindow):
     
 
 
-
-
 class ReservationMenu(QMainWindow):
     def __init__(self, account):
         super(ReservationMenu, self).__init__()
         self.account = account
+        self.dt = None
         self.setup_ui()
 
         self.show()
@@ -147,9 +150,10 @@ class ReservationMenu(QMainWindow):
         self.user_main = UserMain(self.account).show()
 
     def get_date(self):
-        date_time = self.reservation_page.date_input.dateTime().date()
-        date = date_time.toPyDate()
-        self.dt = datetime(date.year, date.month, date.day, date.hour, date.minute, date.second)
+        date_time = self.reservation_page.date_input.dateTime()
+        date = date_time.date()
+        time = date_time.time()
+        self.dt = datetime(date.year(), date.month(), date.day(), time.hour(), time.minute(), 0)
 
     def insert_type(self):
         selected_type = self.reservation_page.type_input.currentText()
@@ -165,12 +169,11 @@ class ReservationMenu(QMainWindow):
         self.reservation_page.horizontalLayout.addWidget(self.combo)
 
     def booking(self):
-        ref = db.reference("/Booking")
+        ref = db.reference(f"/Booking/{self.account}")
         self.selected_service = self.combo.currentText()
         print(self.dt)
-        data_booking = {self.account: 
-                        {str(self.dt): {'service': self.selected_service
-                        }}}
+        data_booking = {str(self.dt): {'service': self.selected_service
+                        }}
         ref.update(data_booking)
 
 
@@ -335,4 +338,80 @@ class ConfirmationPage(QMainWindow):
         else:
             print(f"Error: {response.status_code}")
             return None
+
+
+class MyBookingPage(QMainWindow):
+    def __init__(self, account):
+        super(MyBookingPage, self).__init__()
+        self.account = account
+        self.setup_ui()
+        self.show()
+
+    def setup_ui(self):
+        self.my_booking_page = uic.loadUi('file_ui/my_booking.ui', self)
+        self.my_booking_page.push_back.clicked.connect(self.to_user_main)
+        self.my_booking_page.verticalLayout.addWidget(self.list_booking())
+    
+    def to_user_main(self):
+        if hasattr(self, 'my_booking_page'):
+            self.my_booking_page.close()
+        UserMain(self.account).show()
+
+    def list_booking(self):
+        scroll_area = QScrollArea(self)
+        scroll_area.setWidgetResizable(True)
+
+        content_widget = QWidget()
+        scroll_area.setWidget(content_widget)
+        scroll_area.verticalScrollBar().setStyleSheet("""
+            QScrollBar:vertical {
+                border: 2px solid #555555;
+                background: #999999;
+                width: 10px;
+                background-color: rgb(80, 80, 122);
+            }
+            QScrollBar::handle:vertical {
+                background: #555555;
+                min-height: 20px;
+                background-color: rgb(245, 154, 182);
+            }
+        """)
+
+        content_layout = QGridLayout(content_widget)
+
+        link = f"/Booking/{self.account}"
         
+        self.ref = db.reference(link)
+        data = self.ref.get()
+
+        labels = ['No.', ' ' * 15 + 'Date', ' ' * 15 + 'Service', 'Status']
+
+        for i, label in enumerate(labels):
+            label = QLabel(label)
+            label.setStyleSheet("color: white;")
+            label.setFixedHeight(12)
+            if label == 'No.':
+                content_layout.setColumnMinimumWidth(0, 3)
+            content_layout.addWidget(label, 0, i)
+
+        format_time = "%Y-%m-%d %H:%M:%S"
+
+        for i, (key, value) in enumerate(data.items(), start = 1):
+            status = 'Waiting'
+            if datetime.strptime(key, format_time) < datetime.now():
+                status = 'Finished'
+            row_data = [i, key, value['service'], status]
+            for j, item in enumerate(row_data):
+                label = QLabel(str(item))
+                if item == value['service']:
+                    label.setWordWrap(True)
+                label.setStyleSheet("color: white;")
+                label.setFixedHeight(20)
+                content_layout.addWidget(label, i, j)
+        # content_layout.setColumnMaximumWidth(0, 30)  # Adjust as needed
+        # content_layout.setColumnMinimumWidth(1, 30)  # Adjust as needed
+
+        # Set minimum heights for rows
+        # for i in range(1, len(data) + 1):
+        #     content_layout.setRowMinimumHeight(i, 30)
+        return scroll_area
