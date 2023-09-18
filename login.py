@@ -64,7 +64,7 @@ class Login(QMainWindow):
         username_nonvalid = True
         password_nonvalid = True
 
-        if username == 'admin@gmail.com' and password == 'Haloadmin1234':
+        if username == 'admin@gmail.com' and password == 'Admin1234':
             self.to_admin_main()
             return
 

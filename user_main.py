@@ -69,8 +69,6 @@ class UserMain(QMainWindow):
         self.push_service_list.setIconSize(QSize(65, 65))
 
 
-
-
 class SparepartMenu(QMainWindow):
     def __init__(self, account):
         super(SparepartMenu, self).__init__()
@@ -115,7 +113,6 @@ class SparepartMenu(QMainWindow):
         self.scrollable_layout = SparepartWidget(self.link)
         self.sparepart_menu.verticalLayout.addWidget(self.scrollable_layout)
     
-
 
 class ReservationMenu(QMainWindow):
     def __init__(self, account):
@@ -248,8 +245,6 @@ class ServiceListMenu(QMainWindow):
         return scroll_area
 
 
-
-
 class ConfirmationPage(QMainWindow):
     def __init__(self, data, account):
         super(ConfirmationPage, self).__init__()
@@ -315,7 +310,7 @@ class ConfirmationPage(QMainWindow):
         try:
             ref.update(data_sales)
         except KeyError as e:
-            print(KeyError)
+            print(e)
         
 
 
