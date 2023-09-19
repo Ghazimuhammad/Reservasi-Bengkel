@@ -1,8 +1,7 @@
 import json
 from datetime import datetime
-import numpy as np
+import requests
 
-import sys
 import re
 from PyQt5 import uic
 from PyQt5.QtGui import QPixmap
@@ -11,16 +10,18 @@ from PyQt5.QtWidgets import (
     QLineEdit, QMessageBox, QLabel, QCompleter
 )
 from user_main import UserMain
-from admin_main import AdminMain
-from cred import db
+# from admin_main import AdminMain
+
+
+API_KEY = "AIzaSyCd9mCDnVPCDEzwPtYvmDZvWOAyQTpec1k"
+FIREBASE_URL = "https://projectbengkel-f2242-default-rtdb.asia-southeast1.firebasedatabase.app/"
 
 
 class Login(QMainWindow):
     def __init__(self):
         super(Login, self).__init__()
 
-        self.ref = db.reference('/Account')
-        self.database_login = self.ref.get()
+        self.get_database()
         self.login_page = uic.loadUi('file_ui/login.ui', self)
 
         self.init_widgets()
@@ -41,6 +42,8 @@ class Login(QMainWindow):
         label.setPixmap(pixmap)
         label.setScaledContents(True)
 
+        if self.database_login is None:
+            self.put_database()
         self.show()
 
     def to_create_account(self):
@@ -48,15 +51,24 @@ class Login(QMainWindow):
 
     def to_user_main(self):
         self.navigate_to(UserMain(self.username.text().replace(".", "")))
+        
 
     def to_admin_main(self):
-        self.navigate_to(AdminMain())
+        # self.navigate_to(AdminMain())
+        pass
 
     def navigate_to(self, window):
         if hasattr(self, 'login_page'):
             self.login_page.close()
         self.window = window
         self.window.show()
+
+    def get_database(self):
+        self.response_get = requests.get(FIREBASE_URL + '/Account.json?auth=' + API_KEY)
+        self.database_login = self.response_get.json()
+
+    def put_database(self):
+        requests.put(FIREBASE_URL + '/Account.json?auth=' + API_KEY, json = {'admin@gmailcom': 'Admin1234'})
 
     def verify_login(self):
         username = self.username.text()
@@ -101,8 +113,7 @@ class Signup(QMainWindow):
     def __init__(self):
         super(Signup, self).__init__()
 
-        self.ref = db.reference('/Account')
-        self.database_login = self.ref.get()
+        self.get_database()
 
         self.signup_page = uic.loadUi('file_ui/signup.ui', self)
 
@@ -155,15 +166,17 @@ class Signup(QMainWindow):
             username = username.replace('.', '')
             data_hold = {username: password}
 
-            if self.database_login is None:
-                self.ref.set({'admin@gmailcom': 'Admin1234'})
-                self.ref.update(data_hold)
-            else:
-                self.ref.update(data_hold)
-
+            self.update_database(data_hold)
             self.remove_label()
             self.success_create_account()
             self.to_login()
+
+    def get_database(self):
+        self.response_get = requests.get(FIREBASE_URL + '/Account.json?auth=' + API_KEY)
+        self.database_login = self.response_get.json()
+
+    def update_database(self, data):
+        requests.patch(FIREBASE_URL + '/Account.json?auth=' + API_KEY, json = data)
 
     def alert(self, text):
         alert = QMessageBox(self)

@@ -1,9 +1,10 @@
 from PyQt5.QtWidgets import (QWidget, QLabel, QMessageBox, 
                              QGridLayout, QScrollArea, QPushButton, 
                              QHBoxLayout, QVBoxLayout, QTableWidget, QTableWidgetItem)
+import requests
 
-from firebase_admin import db
-from cred import *
+API_KEY = "AIzaSyCd9mCDnVPCDEzwPtYvmDZvWOAyQTpec1k"
+FIREBASE_URL = "https://projectbengkel-f2242-default-rtdb.asia-southeast1.firebasedatabase.app/"
 
 
 class SparepartWidget(QWidget):
@@ -11,13 +12,13 @@ class SparepartWidget(QWidget):
         super().__init__()
         
         self.link = link
-        self.data = db.reference(self.link).get()
+        self.data = self.get_database(link)
         self.data_buy = []
         self.set_scroll()
 
     def button_clicked(self, index, increment, name):
         check = 0
-        current_data = db.reference(self.link).get()
+        current_data = self.get_database(self.link)
         self.counters[index] += increment
         label = self.findChild(QLabel, f'label_{index}')
         if self.counters[index] < 0:
@@ -33,7 +34,9 @@ class SparepartWidget(QWidget):
         for key, value in current_data.items():
             if key == name:
                 hold = value['stock'] - increment
-                db.reference(self.link).child(key).update({'stock':hold})
+                data_hold = {name: {'price': value['price'], 'stock': hold}}
+                self.update_database(self.link, data_hold)
+                # db.reference(self.link).child(key).update({'stock':hold})
         self.total_quantity_buy = sum(self.counters[1:])
         self.total_price_buy = sum(self.counters[i] * float(data.get(list(data.keys())[0], {}).get('price')) for i, data in enumerate(self.list_data, start=1))
         for data in self.data_buy:
@@ -140,6 +143,14 @@ class SparepartWidget(QWidget):
         layout.addWidget(scroll_area, 9)
         layout.addWidget(Hbox, 1) 
         self.setLayout(layout)
+
+    def get_database(self, directory):
+        response_get = requests.get(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY)
+        database = response_get.json()
+        return database
+    
+    def update_database(self, directory, data):
+        requests.patch(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY, json = data)
 
 
 

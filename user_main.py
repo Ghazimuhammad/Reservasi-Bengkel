@@ -11,8 +11,9 @@ from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import QSize, QDateTime, QTime
 from user_widget import SparepartWidget, ConfirmationWidget, custom_vertikal_bar, custom_horizontal_bar
 
-from firebase_admin import db
-from cred import *
+
+API_KEY = "AIzaSyCd9mCDnVPCDEzwPtYvmDZvWOAyQTpec1k"
+FIREBASE_URL = "https://projectbengkel-f2242-default-rtdb.asia-southeast1.firebasedatabase.app/"
 
 
 
@@ -125,7 +126,7 @@ class ReservationMenu(QMainWindow):
     
     def setup_ui(self):
         self.reservation_page = uic.loadUi('file_ui/reservation.ui', self)
-        self.ref = db.reference("/Login")
+        # self.ref = db.reference("/Login")
 
         self.name = self.findChild(QLineEdit, 'name_input')
         self.handphone = self.findChild(QLineEdit, 'phone_input')
@@ -139,7 +140,7 @@ class ReservationMenu(QMainWindow):
         self.reservation_page.date_input.setMinimumDateTime(current_date)
         self.reservation_page.date_input.setMaximumDateTime(QDateTime(current_date.date(), max_time))
         self.reservation_page.date_input.editingFinished.connect(self.get_date)
-        self.reservation_page.push_booking.clicked.connect(self.booking)
+        self.reservation_page.push_booking.clicked.connect(self.booking_button)
 
     def to_user_main(self):
         if hasattr(self, 'reservation_page'):
@@ -154,8 +155,8 @@ class ReservationMenu(QMainWindow):
 
     def insert_type(self):
         selected_type = self.reservation_page.type_input.currentText()
-        link = f"/ServiceList/{selected_type}"
-        services = db.reference(link).get()
+        link = f"ServiceList/{selected_type}"
+        services = self.get_database(link)
         list_service = []
         for service in services.keys():
             list_service.append(service)
@@ -165,13 +166,20 @@ class ReservationMenu(QMainWindow):
         self.combo.addItems(list_service)
         self.reservation_page.horizontalLayout.addWidget(self.combo)
 
-    def booking(self):
-        ref = db.reference(f"/Booking/{self.account}")
+    def booking_button(self):
         self.selected_service = self.combo.currentText()
         print(self.dt)
         data_booking = {str(self.dt): {'service': self.selected_service
                         }}
-        ref.update(data_booking)
+        self.update_database(f"Booking/{self.account}", data_booking)
+
+    def get_database(self, directory):
+        response_get = requests.get(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY)
+        database = response_get.json()
+        return database
+    
+    def update_database(self, directory, data):
+        requests.patch(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY, json = data)
 
 
 class ServiceListMenu(QMainWindow):
@@ -219,8 +227,7 @@ class ServiceListMenu(QMainWindow):
 
         content_layout = QGridLayout(content_widget)
         
-        self.ref = db.reference(self.link)
-        data = self.ref.get()
+        data = self.get_database(self.link)
 
         labels = ['No.', 'Name', 'Description', 'Price']
 
@@ -243,6 +250,14 @@ class ServiceListMenu(QMainWindow):
             content_layout.setRowMinimumHeight(i, 120)
 
         return scroll_area
+    
+    def get_database(self, directory):
+        response_get = requests.get(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY)
+        database = response_get.json()
+        return database
+    
+    def update_database(self, directory, data):
+        requests.patch(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY, json = data)
 
 
 class ConfirmationPage(QMainWindow):
@@ -294,12 +309,11 @@ class ConfirmationPage(QMainWindow):
             pass
 
     def update_sales(self):
-        ref = db.reference("/Sales")
         current_date = str(datetime.now().date())
         data_temp = {}
         for data in self.data:
             data_temp.update({data['name']: {'quantity': data['quantity'], 'total': data['total']}})
-        data_previous = ref.get()
+        data_previous = self.get_database('/Sales')
 
         if current_date in data_previous.keys():
             data_previous[current_date].update(data_temp)
@@ -308,12 +322,18 @@ class ConfirmationPage(QMainWindow):
 
         data_sales = data_previous
         try:
-            ref.update(data_sales)
+            self.update_database("/Sales", data_sales)
         except KeyError as e:
             print(e)
+
+    def get_database(self, directory):
+        response_get = requests.get(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY)
+        database = response_get.json()
+        return database
+    
+    def update_database(self, directory, data):
+        requests.patch(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY, json = data)
         
-
-
 
     def get_pdf(self):
         data_buy = self.data
@@ -385,10 +405,9 @@ class MyBookingPage(QMainWindow):
 
         content_layout = QGridLayout(content_widget)
 
-        link = f"/Booking/{self.account}"
+        link = f"Booking/{self.account}"
         
-        self.ref = db.reference(link)
-        data = self.ref.get()
+        data = self.get_database(link)
 
         labels = ['No.', ' ' * 15 + 'Date', ' ' * 15 + 'Service', 'Status']
 
@@ -415,3 +434,8 @@ class MyBookingPage(QMainWindow):
                 label.setFixedHeight(20)
                 content_layout.addWidget(label, i, j)
         return scroll_area
+    
+    def get_database(self, directory):
+        response_get = requests.get(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY)
+        database = response_get.json()
+        return database
