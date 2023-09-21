@@ -1,5 +1,3 @@
-import json
-from datetime import datetime
 import requests
 
 import re
@@ -10,7 +8,7 @@ from PyQt5.QtWidgets import (
     QLineEdit, QMessageBox, QLabel, QCompleter
 )
 from user_main import UserMain
-# from admin_main import AdminMain
+from admin_main import AdminMain
 
 
 API_KEY = "AIzaSyCd9mCDnVPCDEzwPtYvmDZvWOAyQTpec1k"
@@ -54,8 +52,7 @@ class Login(QMainWindow):
         
 
     def to_admin_main(self):
-        # self.navigate_to(AdminMain())
-        pass
+        self.navigate_to(AdminMain())
 
     def navigate_to(self, window):
         if hasattr(self, 'login_page'):

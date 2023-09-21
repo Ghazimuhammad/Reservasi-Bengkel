@@ -1,6 +1,5 @@
 import json, requests
-from datetime import datetime
-import pandas as pd
+from datetime import datetime, date
 
 from PyQt5 import uic
 from PyQt5.QtWidgets import (QMainWindow, QPushButton, QScrollArea, 
@@ -90,15 +89,15 @@ class SparepartMenu(QMainWindow):
             self.scrollable_layout = SparepartWidget('/Sparepart/Car')
             self.sparepart_menu.verticalLayout.addWidget(self.scrollable_layout)
             self.beginning = False
+            self.selected_item = 'Car'
         self.sparepart_menu.Combobox.currentIndexChanged.connect(self.insert_sparepart_menu)
-
         self.sparepart_menu.push_next.clicked.connect(self.to_confirmation)
 
     def to_user_main(self):
         self.navigate_to(UserMain(self.account))
 
     def to_confirmation(self):
-        self.navigate_to(ConfirmationPage(self.scrollable_layout.get_data_buy(), self.account))
+        self.navigate_to(ConfirmationPage(self.scrollable_layout.get_data_buy(), self.account, self.selected_item))
 
     def navigate_to(self, window):
         if hasattr(self, 'sparepart_menu'):
@@ -107,8 +106,8 @@ class SparepartMenu(QMainWindow):
         self.window.show()
 
     def insert_sparepart_menu(self):
-        selected_item = self.sparepart_menu.Combobox.currentText()
-        self.link = f"/Sparepart/{selected_item}"
+        self.selected_item = self.sparepart_menu.Combobox.currentText()
+        self.link = f"/Sparepart/{self.selected_item}"
         for i in reversed(range(self.sparepart_menu.verticalLayout.count())):
             self.sparepart_menu.verticalLayout.itemAt(i).widget().setParent(None)
         self.scrollable_layout = SparepartWidget(self.link)
@@ -261,15 +260,16 @@ class ServiceListMenu(QMainWindow):
 
 
 class ConfirmationPage(QMainWindow):
-    def __init__(self, data, account):
+    def __init__(self, data, account, type):
         super(ConfirmationPage, self).__init__()
         self.data = data
         self.account = account
-        self.init_ui()
+        self.type = type
+        self.setup_ui()
 
         self.show()
 
-    def init_ui(self):
+    def setup_ui(self):
         self.confirmation_page = uic.loadUi('file_ui/shopping_cart.ui', self)
         self.confirmation_widget = ConfirmationWidget(self.data)
 
@@ -292,7 +292,7 @@ class ConfirmationPage(QMainWindow):
             f.write(content)
 
     def clicked_buy(self):
-        self.get_pdf()
+        # self.get_pdf()
         self.success_buy()
         self.update_sales()
         if hasattr(self, 'confirmation_page'):
@@ -310,19 +310,22 @@ class ConfirmationPage(QMainWindow):
 
     def update_sales(self):
         current_date = str(datetime.now().date())
+        data_sales = self.get_database(f'Sales/{self.type}')
         data_temp = {}
         for data in self.data:
             data_temp.update({data['name']: {'quantity': data['quantity'], 'total': data['total']}})
-        data_previous = self.get_database('/Sales')
 
-        if current_date in data_previous.keys():
-            data_previous[current_date].update(data_temp)
+        if current_date in data_sales.keys():
+            for name, temp_data in data_temp.items():
+                if name in data_sales[current_date]:
+                    data_sales[current_date][name]['quantity'] += temp_data['quantity']
+                else:
+                    data_sales[current_date][name] = temp_data
         else:
-            data_previous.update({current_date: data_temp})
+            data_sales = {current_date:data_temp}
 
-        data_sales = data_previous
         try:
-            self.update_database("/Sales", data_sales)
+            self.update_database(f"Sales/{self.type}", data_sales)
         except KeyError as e:
             print(e)
 
