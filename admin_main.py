@@ -87,7 +87,7 @@ class Graph(QMainWindow):
         # ax2.bar(df['Category'], df['Values2'])
 
 
-        fig3 = Figure(figsize=(5, 4), dpi=100)
+        fig3 = Figure(figsize=(7, 4), dpi=100)
         canvas3 = FigureCanvas(fig3)
         layout.addWidget(canvas3)
         ax3 = fig3.add_subplot(111)

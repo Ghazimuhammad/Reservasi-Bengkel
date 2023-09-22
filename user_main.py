@@ -3,11 +3,11 @@ from datetime import datetime, date
 
 from PyQt5 import uic
 from PyQt5.QtWidgets import (QMainWindow, QPushButton, QScrollArea, 
-                             QLabel, QLineEdit, QComboBox, 
+                             QLabel, QLineEdit, 
                              QGridLayout, QSizePolicy,
                              QWidget, QMessageBox)
 from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtCore import QSize, QDateTime, QTime
+from PyQt5.QtCore import QSize, QDateTime, QTime, QDate
 from user_widget import SparepartWidget, ConfirmationWidget, custom_vertikal_bar, custom_horizontal_bar
 
 
@@ -78,8 +78,8 @@ class SparepartMenu(QMainWindow):
     
     def setup_ui(self):
         self.sparepart_menu = uic.loadUi('file_ui/sparepart_menu.ui', self)
-        self.label = self.findChild(QLabel, 'logo_sparepart')
-        pixmap = QPixmap('Pictures/sparepart.png')
+        self.label = self.findChild(QLabel, 'logo')
+        pixmap = QPixmap('Pictures/image 2.png')
         self.label.setPixmap(pixmap)
         self.label.setScaledContents(True)
         self.sparepart_menu.push_back.clicked.connect(self.to_user_main)
@@ -125,21 +125,27 @@ class ReservationMenu(QMainWindow):
     
     def setup_ui(self):
         self.reservation_page = uic.loadUi('file_ui/reservation.ui', self)
-        # self.ref = db.reference("/Login")
-
+        label = self.findChild(QLabel, 'logo')
+        pixmap = QPixmap('Pictures/image 2.png')
+        label.setPixmap(pixmap)
+        label.setScaledContents(True)
         self.name = self.findChild(QLineEdit, 'name_input')
         self.handphone = self.findChild(QLineEdit, 'phone_input')
         self.reservation_page.type_input.addItem("Car")
         self.reservation_page.type_input.addItem("Motorcycle")
         self.reservation_page.type_input.currentIndexChanged.connect(self.insert_type)
         self.reservation_page.push_back.clicked.connect(self.to_user_main)
-        current_date = QDateTime.currentDateTime()
-        max_time = QTime(19, 59, 59)
-        self.reservation_page.date_input.setDateTime(current_date)
-        self.reservation_page.date_input.setMinimumDateTime(current_date)
-        self.reservation_page.date_input.setMaximumDateTime(QDateTime(current_date.date(), max_time))
-        self.reservation_page.date_input.editingFinished.connect(self.get_date)
+        self.reservation_page.dateEdit.setMinimumDate(QDate.currentDate())
         self.reservation_page.push_booking.clicked.connect(self.booking_button)
+        self.beginning = True
+        if self.beginning:
+            services = self.get_database('ServiceList/Car')
+            list_service = []
+            for service in services.keys():
+                list_service.append(service)
+            self.reservation_page.service_list.addItems(list_service)
+            self.beginning = False
+
 
     def to_user_main(self):
         if hasattr(self, 'reservation_page'):
@@ -147,10 +153,10 @@ class ReservationMenu(QMainWindow):
         self.user_main = UserMain(self.account).show()
 
     def get_date(self):
-        date_time = self.reservation_page.date_input.dateTime()
-        date = date_time.date()
-        time = date_time.time()
+        date = self.reservation_page.dateEdit.date()
+        time = self.reservation_page.timeEdit.time()
         self.dt = datetime(date.year(), date.month(), date.day(), time.hour(), time.minute(), 0)
+        return self.dt
 
     def insert_type(self):
         selected_type = self.reservation_page.type_input.currentText()
@@ -159,16 +165,13 @@ class ReservationMenu(QMainWindow):
         list_service = []
         for service in services.keys():
             list_service.append(service)
-        for i in reversed(range(self.reservation_page.horizontalLayout.count())):
-            self.reservation_page.horizontalLayout.itemAt(i).widget().setParent(None)
-        self.combo = QComboBox(self)
-        self.combo.addItems(list_service)
-        self.reservation_page.horizontalLayout.addWidget(self.combo)
+        self.reservation_page.service_list.clear()
+        self.reservation_page.service_list.addItems(list_service)
 
     def booking_button(self):
-        self.selected_service = self.combo.currentText()
-        print(self.dt)
-        data_booking = {str(self.dt): {'service': self.selected_service
+        self.selected_service = self.service_list.currentText()
+        print(self.get_date())
+        data_booking = {str(self.get_date()): {'service': self.selected_service
                         }}
         self.update_database(f"Booking/{self.account}", data_booking)
 
@@ -200,6 +203,10 @@ class ServiceListMenu(QMainWindow):
             self.servicelist_menu.verticalLayout.addWidget(self.scrollable_layout)
             beginning = False
         self.servicelist_menu.Combobox.currentIndexChanged.connect(self.get_activated)
+        label = self.findChild(QLabel, 'logo_sparepart')
+        pixmap = QPixmap('Pictures/image 2.png')
+        label.setPixmap(pixmap)
+        label.setScaledContents(True)
 
     def to_user_main(self):
         if hasattr(self, 'servicelist_menu'):
@@ -223,6 +230,7 @@ class ServiceListMenu(QMainWindow):
         scroll_area.setWidget(content_widget)
         scroll_area.verticalScrollBar().setStyleSheet(str(custom_vertikal_bar()))
         scroll_area.horizontalScrollBar().setStyleSheet(str(custom_horizontal_bar()))
+        scroll_area.setStyleSheet("border: 5px;")
 
         content_layout = QGridLayout(content_widget)
         
@@ -405,6 +413,7 @@ class MyBookingPage(QMainWindow):
         scroll_area.setWidget(content_widget)
         scroll_area.verticalScrollBar().setStyleSheet(str(custom_vertikal_bar()))
         scroll_area.horizontalScrollBar().setStyleSheet(str(custom_horizontal_bar()))
+        scroll_area.setStyleSheet("border: 5px;")
 
         content_layout = QGridLayout(content_widget)
 

@@ -76,6 +76,7 @@ class SparepartWidget(QWidget):
         scroll_area.setWidget(content_widget)
         scroll_area.verticalScrollBar().setStyleSheet(str(custom_vertikal_bar()))
         scroll_area.horizontalScrollBar().setStyleSheet(str(custom_horizontal_bar()))
+        scroll_area.setStyleSheet("border: 5px;")
 
         content_layout = QGridLayout(content_widget)
 
@@ -89,8 +90,9 @@ class SparepartWidget(QWidget):
             if i == 3:
                 i+= 1
             header = QLabel(label)
-            header.setStyleSheet("color: white;")
+            # header.setStyleSheet("color: rgb(0, 0, 0); background-color: #aabade; /* Background color */font-size: 14px;padding: 8px;border-radius: 5px")
             content_layout.addWidget(header, 0, i)
+        
 
         i = 1
 
@@ -101,13 +103,20 @@ class SparepartWidget(QWidget):
             
             label = QLabel(list(data.keys())[0])
             content_layout.addWidget(label, i, 1)
-            label.setStyleSheet("color: white;")
+            # label.setStyleSheet("color: rgb(0, 0, 0); background-color: #aabade; /* Background color */font-size: 12px;padding: 4px;border-radius: 5px")
 
             price = QLabel(str(data.get(list(data.keys())[0], {}).get('price')) + 'k')
             content_layout.addWidget(price, i, 2)
             price.setStyleSheet("color: white;")
 
             button_minus = QPushButton(f'-')
+            button_minus.setStyleSheet("QPushButton{background-color: rgb(80, 80, 122);\
+                                       color: white;\
+                                       border: none;\
+                                       border-radius: 7px;padding: 4px 10px;}\
+                                       QPushButton:hover {background-color: rgb(245, 154, 182);}\
+                                       QPushButton:pressed {background-color: rgb(109, 68, 81);}\
+                                       color: rgb(255, 255, 255);")
             content_layout.addWidget(button_minus, i, 3)
 
             self.counters.append(0) 
@@ -117,6 +126,13 @@ class SparepartWidget(QWidget):
             count.setStyleSheet("color: white;")
 
             button_plus = QPushButton(f'+')
+            button_plus.setStyleSheet("QPushButton{background-color: rgb(80, 80, 122);\
+                                       color: white;\
+                                       border: none;\
+                                       border-radius: 7px;padding: 4px 10px;}\
+                                       QPushButton:hover {background-color: rgb(245, 154, 182);}\
+                                       QPushButton:pressed {background-color: rgb(109, 68, 81);}\
+                                       color: rgb(255, 255, 255);")
             content_layout.addWidget(button_plus, i, 5)
 
             button_plus.clicked.connect(lambda checked, index=i, name=list(data.keys())[0]: self.button_clicked(index, 1, name))
@@ -127,13 +143,13 @@ class SparepartWidget(QWidget):
         layout.addWidget(scroll_area, 9)
         Hbox = QWidget(self) 
         Hbox_layout = QHBoxLayout(Hbox)  
-        self.quantity_label = QLabel("Total quantity")
+        self.quantity_label = QLabel("<b>Total quantity<b>")
         self.quantity_label.setStyleSheet("color: white;")
         Hbox_layout.addWidget(self.quantity_label)
         self.total_quantity = QLabel(" " * 10 + "0")
         self.total_quantity.setStyleSheet("color: white;")
         Hbox_layout.addWidget(self.total_quantity)
-        self.price_label = QLabel("Total price")
+        self.price_label = QLabel("<b>Total price<b>")
         self.price_label.setStyleSheet("color: white;")
         Hbox_layout.addWidget(self.price_label)
         self.total_price = QLabel(" " * 10 + "0")

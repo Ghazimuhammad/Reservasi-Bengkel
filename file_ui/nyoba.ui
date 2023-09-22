@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>483</width>
+    <width>482</width>
     <height>640</height>
    </rect>
   </property>
@@ -72,10 +72,13 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(117, 80, 123);
-font-size: 14px;
-padding: 8px;
-border-radius: 5px</string>
+        <string notr="true">QLabel {
+        color: #ffffff; /* Text color */
+        background-color: rgb(80, 80, 122); /* Background color */
+        border: 2px solid #555555; /* Border color and thickness */
+        border-radius: 10px; /* Border radius for rounded corners */
+        padding: 10px; /* Padding inside the label */
+    }</string>
        </property>
        <property name="text">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#ffffff;&quot;&gt;Name&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -83,20 +86,18 @@ border-radius: 5px</string>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="name_input">
-       <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 0); 
-background-color: rgb(80, 80, 122); 
-font-size: 14px;
-padding: 8px;
-border-radius: 5px</string>
-       </property>
-      </widget>
+      <widget class="QLineEdit" name="name_input"/>
      </item>
      <item>
       <widget class="QLabel" name="label_3">
        <property name="styleSheet">
-        <string notr="true"/>
+        <string notr="true">QLabel {
+        color: #ffffff; /* Text color */
+        background-color: rgb(80, 80, 122); /* Background color */
+        border: 2px solid #555555; /* Border color and thickness */
+        border-radius: 10px; /* Border radius for rounded corners */
+        padding: 10px; /* Padding inside the label */
+    }</string>
        </property>
        <property name="text">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#ffffff;&quot;&gt;Date&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -106,53 +107,64 @@ border-radius: 5px</string>
      <item>
       <widget class="QDateEdit" name="dateEdit">
        <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 0); 
-background-color: rgb(80, 80, 122); 
-font-size: 14px;
-padding: 8px;
-border-radius: 5px</string>
+        <string notr="true">background-color: rgb(255, 255, 255);
+color: rgb(46, 52, 54);</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QLabel" name="label_6">
        <property name="styleSheet">
-        <string notr="true"/>
+        <string notr="true">QLabel {
+        color: #ffffff; /* Text color */
+        background-color: rgb(80, 80, 122); /* Background color */
+        border: 2px solid #555555; /* Border color and thickness */
+        border-radius: 10px; /* Border radius for rounded corners */
+        padding: 10px; /* Padding inside the label */
+    }</string>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#ffffff;&quot;&gt;Time&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#ffffff;&quot;&gt;Time&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QTimeEdit" name="timeEdit">
        <property name="styleSheet">
-        <string notr="true">color: rgb(0, 0, 0); 
-background-color: rgb(80, 80, 122); 
-font-size: 14px;
-padding: 8px;
-border-radius: 5px</string>
+        <string notr="true"/>
        </property>
-       <property name="maximumTime">
-        <time>
+       <property name="maximumDateTime">
+        <datetime>
          <hour>17</hour>
          <minute>59</minute>
          <second>59</second>
-        </time>
+         <year>2000</year>
+         <month>1</month>
+         <day>1</day>
+        </datetime>
        </property>
-       <property name="minimumTime">
-        <time>
+       <property name="minimumDateTime">
+        <datetime>
          <hour>9</hour>
          <minute>0</minute>
          <second>0</second>
-        </time>
+         <year>2000</year>
+         <month>1</month>
+         <day>1</day>
+        </datetime>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QLabel" name="label_4">
        <property name="styleSheet">
-        <string notr="true"/>
+        <string notr="true">QLabel {
+        color: #ffffff; /* Text color */
+        background-color: rgb(80, 80, 122); /* Background color */
+        border: 2px solid #555555; /* Border color and thickness */
+        border-radius: 10px; /* Border radius for rounded corners */
+        padding: 10px; /* Padding inside the label */
+    }</string>
        </property>
        <property name="text">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#ffffff;&quot;&gt;Type&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -163,10 +175,10 @@ border-radius: 5px</string>
       <widget class="QComboBox" name="type_input">
        <property name="styleSheet">
         <string notr="true">QComboBox {
-    background-color: rgb(80, 80, 122); 
-    border: 2px solid rgb(80, 80, 122);
+    background-color: #aabade;
+    border: 2px solid #aabade;
     border-radius: 10px;
-    padding: 5px 7px;
+    padding: 3px 7px;
     font-size: 16px;
     min-width: 150px;
     color: #ffffff;  /* Text color */
@@ -174,7 +186,7 @@ border-radius: 5px</string>
 }
 
 QComboBox::drop-down {
-    background-color: rgb(80, 80, 122); 
+    background-color: #aabade;
     border: none;
     width: 30px;
     border-top-right-radius: 10px;
@@ -202,7 +214,13 @@ QComboBox QAbstractItemView {
      <item>
       <widget class="QLabel" name="label_5">
        <property name="styleSheet">
-        <string notr="true"/>
+        <string notr="true">QLabel {
+        color: #ffffff; /* Text color */
+        background-color: rgb(80, 80, 122); /* Background color */
+        border: 2px solid #555555; /* Border color and thickness */
+        border-radius: 10px; /* Border radius for rounded corners */
+        padding: 10px; /* Padding inside the label */
+    }</string>
        </property>
        <property name="text">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; color:#ffffff;&quot;&gt;List Service&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -210,44 +228,7 @@ QComboBox QAbstractItemView {
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="service_list">
-       <property name="styleSheet">
-        <string notr="true">QComboBox {
-    background-color: rgb(80, 80, 122); 
-    border: 2px solid rgb(80, 80, 122);
-    border-radius: 10px;
-    padding: 5px 7px;
-    font-size: 16px;
-    min-width: 150px;
-    color: #ffffff;  /* Text color */
-    selection-background-color: #aabade;
-}
-
-QComboBox::drop-down {
-    background-color: rgb(80, 80, 122); 
-    border: none;
-    width: 30px;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-}
-
-QComboBox::down-arrow {
-    image: url(down_arrow.png);
-    width: 15px;
-    height: 15px;
-}
-
-QComboBox QAbstractItemView {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #2D2E43;  /* Item view background color */
-    selection-background-color: #aabade;
-    selection-color: #ffffff;  /* Item view text color */
-    min-width: 150px;
-    font-size: 16px;
-}</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_2"/>
      </item>
     </layout>
    </widget>
@@ -339,7 +320,7 @@ color: rgb(255, 255, 255);</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>483</width>
+     <width>482</width>
      <height>22</height>
     </rect>
    </property>
