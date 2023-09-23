@@ -1,14 +1,14 @@
 import json, requests
-from datetime import datetime, date
+from datetime import datetime
 
 from PyQt5 import uic
 from PyQt5.QtWidgets import (QMainWindow, QPushButton, QScrollArea, 
                              QLabel, QLineEdit, 
-                             QGridLayout, QSizePolicy,
+                             QGridLayout, QTableWidgetItem,
                              QWidget, QMessageBox)
-from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtCore import QSize, QDateTime, QTime, QDate
-from user_widget import SparepartWidget, ConfirmationWidget, custom_vertikal_bar, custom_horizontal_bar
+from PyQt5.QtGui import QPixmap, QIcon, QBrush, QColor
+from PyQt5.QtCore import QSize, QDate
+from user_widget import SparepartWidget, custom_vertikal_bar, custom_horizontal_bar
 
 
 API_KEY = "AIzaSyCd9mCDnVPCDEzwPtYvmDZvWOAyQTpec1k"
@@ -42,7 +42,11 @@ class UserMain(QMainWindow):
         self.navigate_to(ServiceListMenu(self.account))
     
     def to_my_booking(self):
-        self.navigate_to(MyBookingPage(self.account))
+        try:
+            self.navigate_to(MyBookingPage(self.account))
+        except:
+            self.alert()
+
     
     def navigate_to(self, window):
         if hasattr(self, 'main_page'):
@@ -67,6 +71,16 @@ class UserMain(QMainWindow):
         self.push_service_list = self.findChild(QPushButton, 'push_service_list')
         self.push_service_list.setIcon(QIcon("Pictures/list.png"))
         self.push_service_list.setIconSize(QSize(65, 65))
+    
+    def alert(self):
+        alert = QMessageBox(self)
+        alert.setWindowTitle('Alert!')
+        alert.setText("You haven't made a reservation yet, please make a reservation first")
+        alert.setIcon(QMessageBox.Warning)
+        alert.setStyleSheet("color: white;")
+        button = alert.exec()
+        if button == QMessageBox.Ok:
+            pass
 
 
 class SparepartMenu(QMainWindow):
@@ -130,7 +144,6 @@ class ReservationMenu(QMainWindow):
         label.setPixmap(pixmap)
         label.setScaledContents(True)
         self.name = self.findChild(QLineEdit, 'name_input')
-        self.handphone = self.findChild(QLineEdit, 'phone_input')
         self.reservation_page.type_input.addItem("Car")
         self.reservation_page.type_input.addItem("Motorcycle")
         self.reservation_page.type_input.currentIndexChanged.connect(self.insert_type)
@@ -170,10 +183,11 @@ class ReservationMenu(QMainWindow):
 
     def booking_button(self):
         self.selected_service = self.service_list.currentText()
-        print(self.get_date())
         data_booking = {str(self.get_date()): {'service': self.selected_service
                         }}
         self.update_database(f"Booking/{self.account}", data_booking)
+        self.success_book()
+        self.to_user_main()
 
     def get_database(self, directory):
         response_get = requests.get(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY)
@@ -182,6 +196,16 @@ class ReservationMenu(QMainWindow):
     
     def update_database(self, directory, data):
         requests.patch(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY, json = data)
+
+    def success_book(self):
+        success = QMessageBox(self)
+        success.setWindowTitle('Thank You!')
+        success.setText("Your reservation has been successfull!")
+        success.setIcon(QMessageBox.Information)
+        success.setStyleSheet("color: white;")
+        button = success.exec()
+        if button == QMessageBox.Ok:
+            pass
 
 
 class ServiceListMenu(QMainWindow):
@@ -274,19 +298,70 @@ class ConfirmationPage(QMainWindow):
         self.account = account
         self.type = type
         self.setup_ui()
+        self.insert_table()
 
         self.show()
 
     def setup_ui(self):
         self.confirmation_page = uic.loadUi('file_ui/shopping_cart.ui', self)
-        self.confirmation_widget = ConfirmationWidget(self.data)
-
-        self.confirmation_page.verticalLayout.addWidget(self.confirmation_widget) 
-
-        self.confirmation_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        label = self.findChild(QLabel, 'logo_sparepart')
+        pixmap = QPixmap('Pictures/image 2.png')
+        label.setPixmap(pixmap)
+        label.setScaledContents(True)
         self.confirmation_page.push_back.clicked.connect(self.to_sparepart)
 
         self.confirmation_page.push_buy.clicked.connect(self.clicked_buy)
+
+    def insert_table(self):
+        self.total_quantity = self.data[-1]['Total quantity']
+        self.total_price = self.data[-1]['Total price']
+        data_buy = self.data[:-1]
+        # self.confirmation_page.tableWidget.setStyleSheet("border: 5px;")
+        self.confirmation_page.tableWidget.setStyleSheet("QTableWidget {background-color: #2D2E43; border: 2px #d0d2f9;border-radius: 10px;gridline-color: #ccc;}\
+                                                        QHeaderView::section {background-color: #aabade;color: #14212b;padding: 5px;border: 1px solid #ccc;font-size: 14px;}\
+                                                        QTableWidgetItem {border: 1px solid #ccc;padding: 5px;font-size: 12px;color: #ffffff;  /* Text color */}")
+        self.confirmation_page.tableWidget.setColumnCount(3)
+        self.confirmation_page.tableWidget.setRowCount(len(data_buy) + 1)
+        self.confirmation_page.tableWidget.setColumnWidth(0, 175)
+        self.confirmation_page.tableWidget.setColumnWidth(1, 100)
+        self.confirmation_page.tableWidget.setColumnWidth(2, 136)
+        self.confirmation_page.tableWidget.setHorizontalHeaderLabels(['Name', 'Quantity', 'Price'])
+        i = 0
+
+        for data in data_buy:
+
+            item1 = QTableWidgetItem(f"{data['name']}")
+            item1.setForeground(QBrush(QColor(255, 255, 255)))
+            self.confirmation_page.tableWidget.setItem(i, 0, item1)
+
+            item2 = QTableWidgetItem(" " * 12 + f"{data['quantity']}")
+            item2.setForeground(QBrush(QColor(255, 255, 255)))
+            self.confirmation_page.tableWidget.setItem(i, 1, item2)
+
+            item3 = QTableWidgetItem(" " * 12 + str(data['price']) + 'k')
+            item3.setForeground(QBrush(QColor(255, 255, 255)))
+            self.confirmation_page.tableWidget.setItem(i, 2, item3)
+
+
+            i += 1
+        
+        total = QTableWidgetItem('Total')
+        total.setForeground(QBrush(QColor(255, 255, 255)))
+        self.confirmation_page.tableWidget.setItem(i, 0, total)
+
+        total1 = QTableWidgetItem(" " * 12 + str(self.total_quantity))
+        total1.setForeground(QBrush(QColor(255, 255, 255)))
+        self.confirmation_page.tableWidget.setItem(i, 1, total1)
+
+        total2 = QTableWidgetItem(" " * 12 + str(self.total_price) + 'k')
+        total2.setForeground(QBrush(QColor(255, 255, 255)))
+        self.confirmation_page.tableWidget.setItem(i, 2, total2)
+
+        # layout = QVBoxLayout(self.confirmation_page.tableWidget)
+        
+        # self.confirmation_page.tableWidget.setShowGrid(True)
+        # self.confirmation_page.tableWidget.verticalHeader().setVisible(False)  
+        # self.confirmation_page.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers) 
 
 
     def to_sparepart(self):
@@ -299,28 +374,13 @@ class ConfirmationPage(QMainWindow):
         with open(filename, 'wb') as f:
             f.write(content)
 
-    def clicked_buy(self):
-        # self.get_pdf()
-        self.success_buy()
-        self.update_sales()
-        if hasattr(self, 'confirmation_page'):
-            self.confirmation_page.close()
-        UserMain(self.account).show()
 
-    def success_buy(self):
-        success = QMessageBox(self)
-        success.setWindowTitle('Thank You!')
-        success.setText("Your transaction has been successfull!")
-        success.setIcon(QMessageBox.Information)
-        button = success.exec()
-        if button == QMessageBox.Ok:
-            pass
 
     def update_sales(self):
         current_date = str(datetime.now().date())
         data_sales = self.get_database(f'Sales/{self.type}')
         data_temp = {}
-        for data in self.data:
+        for data in self.data[:-1]:
             data_temp.update({data['name']: {'quantity': data['quantity'], 'total': data['total']}})
 
         if current_date in data_sales.keys():
@@ -386,6 +446,24 @@ class ConfirmationPage(QMainWindow):
         else:
             print(f"Error: {response.status_code}")
             return None
+    
+    def clicked_buy(self):
+        # self.get_pdf()
+        self.success_buy()
+        self.update_sales()
+        if hasattr(self, 'confirmation_page'):
+            self.confirmation_page.close()
+        UserMain(self.account).show()
+
+    def success_buy(self):
+        success = QMessageBox(self)
+        success.setWindowTitle('Thank You!')
+        success.setText("Your transaction has been successfull!")
+        success.setIcon(QMessageBox.Information)
+        success.setStyleSheet("color: white;")
+        button = success.exec()
+        if button == QMessageBox.Ok:
+            pass
 
 
 class MyBookingPage(QMainWindow):
@@ -399,6 +477,10 @@ class MyBookingPage(QMainWindow):
         self.my_booking_page = uic.loadUi('file_ui/my_booking.ui', self)
         self.my_booking_page.push_back.clicked.connect(self.to_user_main)
         self.my_booking_page.verticalLayout.addWidget(self.list_booking())
+        label = self.findChild(QLabel, 'logo_sparepart')
+        pixmap = QPixmap('Pictures/image 2.png')
+        label.setPixmap(pixmap)
+        label.setScaledContents(True)
     
     def to_user_main(self):
         if hasattr(self, 'my_booking_page'):

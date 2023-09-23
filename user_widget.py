@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (QWidget, QLabel, QMessageBox, 
                              QGridLayout, QScrollArea, QPushButton, 
-                             QHBoxLayout, QVBoxLayout, QTableWidget, QTableWidgetItem)
+                             QHBoxLayout, QVBoxLayout)
 import requests
 
 API_KEY = "AIzaSyCd9mCDnVPCDEzwPtYvmDZvWOAyQTpec1k"
@@ -49,14 +49,15 @@ class SparepartWidget(QWidget):
             self.data_buy.append({'name': name, 'quantity': self.counters[index], 'price': self.data[name]['price'], 'total': self.counters[index] * self.data[name]['price']})
             check = 1
 
-        self.total_quantity.setText(" " * 10 + str(self.total_quantity_buy))
-        self.total_price.setText(" " * 10 + str(self.total_price_buy) + 'k')
+        self.total_quantity.setText(" " * 10 + f"<b>{str(self.total_quantity_buy)}<b>")
+        self.total_price.setText(" " * 10 + f"<b>{str(self.total_price_buy)}<b>" + 'k')
 
     def alert(self, text):
         alert = QMessageBox(self)
         alert.setWindowTitle('Alert!')
         alert.setText(text)
         alert.setIcon(QMessageBox.Warning)
+        alert.setStyleSheet("color: white;")
         button = alert.exec()
         if button == QMessageBox.Ok:
             pass
@@ -90,7 +91,7 @@ class SparepartWidget(QWidget):
             if i == 3:
                 i+= 1
             header = QLabel(label)
-            # header.setStyleSheet("color: rgb(0, 0, 0); background-color: #aabade; /* Background color */font-size: 14px;padding: 8px;border-radius: 5px")
+            header.setStyleSheet("color: white;")
             content_layout.addWidget(header, 0, i)
         
 
@@ -104,6 +105,7 @@ class SparepartWidget(QWidget):
             label = QLabel(list(data.keys())[0])
             content_layout.addWidget(label, i, 1)
             # label.setStyleSheet("color: rgb(0, 0, 0); background-color: #aabade; /* Background color */font-size: 12px;padding: 4px;border-radius: 5px")
+            label.setStyleSheet("color: white;")
 
             price = QLabel(str(data.get(list(data.keys())[0], {}).get('price')) + 'k')
             content_layout.addWidget(price, i, 2)
@@ -146,13 +148,13 @@ class SparepartWidget(QWidget):
         self.quantity_label = QLabel("<b>Total quantity<b>")
         self.quantity_label.setStyleSheet("color: white;")
         Hbox_layout.addWidget(self.quantity_label)
-        self.total_quantity = QLabel(" " * 10 + "0")
+        self.total_quantity = QLabel(" " * 20 + "<b>0<b>")
         self.total_quantity.setStyleSheet("color: white;")
         Hbox_layout.addWidget(self.total_quantity)
         self.price_label = QLabel("<b>Total price<b>")
         self.price_label.setStyleSheet("color: white;")
         Hbox_layout.addWidget(self.price_label)
-        self.total_price = QLabel(" " * 10 + "0")
+        self.total_price = QLabel(" " * 20 + "<b>0<b>")
         self.total_price.setStyleSheet("color: white;")
         Hbox_layout.addWidget(self.total_price)
 
@@ -168,57 +170,6 @@ class SparepartWidget(QWidget):
     def update_database(self, directory, data):
         requests.patch(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY, json = data)
 
-
-
-
-
-class ConfirmationWidget(QWidget):
-    def __init__(self, data):
-        super().__init__()
-        self.total_quantity = data[-1]['Total quantity']
-        self.total_price = data[-1]['Total price']
-        del data[-1]
-        self.data = data
-
-        self.resume()
-
-    def resume(self):
-        content_layout = QGridLayout()
-        table = QTableWidget(len(self.data), 3)
-        table.setHorizontalHeaderLabels(['Name', 'Quantity', 'Price'])
-        i = 0
-
-        for data in self.data:
-
-            item1 = QTableWidgetItem(f"{data['name']}")
-            table.setItem(i, 0, item1)
-
-            item2 = QTableWidgetItem(" " * 12 + f"{data['quantity']}")
-            table.setItem(i, 1, item2)
-
-            item3 = QTableWidgetItem(" " * 12 + str(data['price']) + 'k')
-            table.setItem(i, 2, item3)
-
-
-            i += 1
-        
-        total = QTableWidgetItem('Total')
-        table.setItem(i, 0, total)
-
-        total1 = QTableWidgetItem(" " * 12 + str(self.total_quantity))
-        table.setItem(i, 1, total1)
-
-        total2 = QTableWidgetItem(" " * 12 + str(self.total_price))
-        table.setItem(i, 2, total2)
-        
-        table.setShowGrid(True)
-        table.verticalHeader().setVisible(False)  
-        table.setEditTriggers(QTableWidget.NoEditTriggers)  
-
-        layout = QVBoxLayout()
-
-        layout.addWidget(table)
-        self.setLayout(layout)
 
 def custom_vertikal_bar():
     return ("/* VERTICAL SCROLLBAR */\n"

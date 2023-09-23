@@ -133,11 +133,21 @@ font-size: 14px;
 padding: 8px;
 border-radius: 5px</string>
        </property>
+       <property name="maximumDateTime">
+        <datetime>
+         <hour>18</hour>
+         <minute>0</minute>
+         <second>0</second>
+         <year>2000</year>
+         <month>1</month>
+         <day>1</day>
+        </datetime>
+       </property>
        <property name="maximumTime">
         <time>
-         <hour>17</hour>
-         <minute>59</minute>
-         <second>59</second>
+         <hour>18</hour>
+         <minute>0</minute>
+         <second>0</second>
         </time>
        </property>
        <property name="minimumTime">

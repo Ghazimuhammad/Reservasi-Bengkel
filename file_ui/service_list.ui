@@ -17,59 +17,13 @@
    <string notr="true">background-color: #2D2E43;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QComboBox" name="Combobox">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>130</y>
-      <width>421</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QComboBox {
-    background-color: #aabade;
-    border: 2px solid #aabade;
-    border-radius: 10px;
-    padding: 8px 16px;
-    font-size: 16px;
-    min-width: 150px;
-    color: #ffffff;  /* Text color */
-    selection-background-color: #aabade;
-}
-
-QComboBox::drop-down {
-    background-color: #aabade;
-    border: none;
-    width: 30px;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-}
-
-QComboBox::down-arrow {
-    image: url(down_arrow.png);
-    width: 15px;
-    height: 15px;
-}
-
-QComboBox QAbstractItemView {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #2D2E43;  /* Item view background color */
-    selection-background-color: #aabade;
-    selection-color: #ffffff;  /* Item view text color */
-    min-width: 150px;
-    font-size: 16px;
-}</string>
-    </property>
-   </widget>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>170</y>
+      <y>180</y>
       <width>431</width>
-      <height>381</height>
+      <height>371</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout"/>
@@ -125,7 +79,7 @@ color: rgb(255, 255, 255);</string>
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>20</y>
+      <y>10</y>
       <width>431</width>
       <height>81</height>
      </rect>
@@ -148,6 +102,65 @@ color: rgb(255, 255, 255);</string>
       <widget class="QLabel" name="label">
        <property name="text">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:20pt; font-weight:600; color:#ffffff;&quot;&gt;Service List&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>100</y>
+      <width>431</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;Please choose your vehicle type below&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="Combobox">
+       <property name="styleSheet">
+        <string notr="true">QComboBox {
+    background-color: #aabade;
+    border: 2px solid;
+    border-radius: 10px;
+    padding: 3px 7px;
+    font-size: 16px;
+    min-width: 150px;
+    color: #ffffff;  /* Text color */
+    selection-background-color: #aabade;
+}
+
+QComboBox::drop-down {
+    background-color: #aabade;
+    border: none;
+    width: 30px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+QComboBox::down-arrow {
+    image: url(down_arrow.png);
+    width: 15px;
+    height: 15px;
+}
+
+QComboBox QAbstractItemView {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #2D2E43;  /* Item view background color */
+    selection-background-color: #aabade;
+    selection-color: #ffffff;  /* Item view text color */
+    min-width: 150px;
+    font-size: 16px;
+}</string>
        </property>
       </widget>
      </item>

@@ -97,6 +97,7 @@ class Login(QMainWindow):
         alert.setWindowTitle('Alert!')
         alert.setText(text)
         alert.setIcon(QMessageBox.Warning)
+        alert.setStyleSheet("color: white;")
         button = alert.exec()
         if button == QMessageBox.Ok:
             pass
@@ -180,6 +181,7 @@ class Signup(QMainWindow):
         alert.setWindowTitle('Alert!')
         alert.setText(text)
         alert.setIcon(QMessageBox.Warning)
+        alert.setStyleSheet("color: white;")
         button = alert.exec()
         if button == QMessageBox.Ok:
             pass
@@ -189,6 +191,7 @@ class Signup(QMainWindow):
         success.setWindowTitle('Congratulations!')
         success.setText("Your account has been created!")
         success.setIcon(QMessageBox.Information)
+        success.setStyleSheet("color: white;")
         button = success.exec()
         if button == QMessageBox.Ok:
             pass
