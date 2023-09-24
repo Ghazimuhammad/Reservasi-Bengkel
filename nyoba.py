@@ -1,38 +1,26 @@
-import sys
-from PyQt5.QtWidgets import QApplication, QComboBox, QWidget
+import requests, pandas
+from datetime import datetime
 
-class ModernComboBox(QComboBox):
-    def __init__(self):
-        super().__init__()
+API_KEY = "AIzaSyCd9mCDnVPCDEzwPtYvmDZvWOAyQTpec1k"
+FIREBASE_URL = "https://projectbengkel-f2242-default-rtdb.asia-southeast1.firebasedatabase.app/"
 
-        # Set stylesheet to customize appearance
-        self.setStyleSheet('''
-            QComboBox {
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                padding: 1px 18px 1px 3px;
-                background: white;
-                selection-background-color: #f0f0f0;
-            }
-            
-            QComboBox::drop-down {
-                subcontrol-origin: padding;
-                subcontrol-position: top right;
-                width: 20px;
-                border-left: 1px solid #ccc;
-                border-radius: 3px;
-            }
-            
-            QComboBox::down-arrow {
-                image: url(down_arrow.png); /* Add path to your custom arrow image */
-            }
-        ''')
+def get_database(directory):
+        response_get = requests.get(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY)
+        database = response_get.json()
+        return database
+    
+def update_database(directory, data):
+        requests.patch(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY, json = data)
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    combo_box = ModernComboBox()
-    combo_box.addItem("Option 1")
-    combo_box.addItem("Option 2")
-    combo_box.addItem("Option 3")
-    combo_box.show()
-    sys.exit(app.exec_())
+
+data = get_database('Sales/Motorcycle/Service')
+df = pandas.DataFrame([
+    (date, product, info) 
+    for date, products in data.items() 
+    for product, info in products.items()
+], columns=['Date', 'Product', 'Quantity'])
+print(df)
+
+# data = {str(datetime.now().date()):{'Claim service': 1}}
+
+# update_database('Sales/Motorcycle/Service', data)

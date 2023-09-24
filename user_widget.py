@@ -36,7 +36,6 @@ class SparepartWidget(QWidget):
                 hold = value['stock'] - increment
                 data_hold = {name: {'price': value['price'], 'stock': hold}}
                 self.update_database(self.link, data_hold)
-                # db.reference(self.link).child(key).update({'stock':hold})
         self.total_quantity_buy = sum(self.counters[1:])
         self.total_price_buy = sum(self.counters[i] * float(data.get(list(data.keys())[0], {}).get('price')) for i, data in enumerate(self.list_data, start=1))
         for data in self.data_buy:

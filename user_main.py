@@ -1,5 +1,6 @@
 import json, requests
 from datetime import datetime
+from random import randint
 
 from PyQt5 import uic
 from PyQt5.QtWidgets import (QMainWindow, QPushButton, QScrollArea, 
@@ -97,7 +98,7 @@ class SparepartMenu(QMainWindow):
         self.label.setPixmap(pixmap)
         self.label.setScaledContents(True)
         self.sparepart_menu.push_back.clicked.connect(self.to_user_main)
-        self.sparepart_menu.Combobox.addItems(["Car", 'MotorCycle'])
+        self.sparepart_menu.Combobox.addItems(["Car", 'Motorcycle'])
         self.beginning = True
         if self.beginning:
             self.scrollable_layout = SparepartWidget('/Sparepart/Car')
@@ -172,8 +173,8 @@ class ReservationMenu(QMainWindow):
         return self.dt
 
     def insert_type(self):
-        selected_type = self.reservation_page.type_input.currentText()
-        link = f"ServiceList/{selected_type}"
+        self.selected_type = self.reservation_page.type_input.currentText()
+        link = f"ServiceList/{self.selected_type}"
         services = self.get_database(link)
         list_service = []
         for service in services.keys():
@@ -183,9 +184,31 @@ class ReservationMenu(QMainWindow):
 
     def booking_button(self):
         self.selected_service = self.service_list.currentText()
-        data_booking = {str(self.get_date()): {'service': self.selected_service
+        current_date = self.get_date()
+        data_booking = {str(current_date): {'service': self.selected_service
                         }}
         self.update_database(f"Booking/{self.account}", data_booking)
+        data_sales = {str(current_date.date()): {self.selected_service: 1}}
+        try:
+            current_data_service = self.get_database(f'Sales/{self.selected_type}/Service')
+            if str(current_date.date()) in current_data_service.keys():
+                if self.selected_service in current_data_service[str(current_date.date())].keys():
+                    current_data_service[str(current_date.date())][self.selected_service] += 1
+                    data_sales = current_data_service
+                else:
+                    current_data_service[str(current_date.date())][self.selected_service] = 1
+                    data_sales = current_data_service
+            self.update_database(f"Sales/{self.selected_type}/Service", data_sales)
+        except:
+            current_data_service = self.get_database('Sales/Car/Service')
+            if str(current_date.date()) in current_data_service.keys():
+                if self.selected_service in current_data_service[str(current_date.date())].keys():
+                    current_data_service[str(current_date.date())][self.selected_service] += 1
+                    data_sales = current_data_service
+                else:
+                    current_data_service[str(current_date.date())][self.selected_service] = 1
+                    data_sales = current_data_service
+            self.update_database("Sales/Car/Service", data_sales)
         self.success_book()
         self.to_user_main()
 
@@ -357,11 +380,6 @@ class ConfirmationPage(QMainWindow):
         total2.setForeground(QBrush(QColor(255, 255, 255)))
         self.confirmation_page.tableWidget.setItem(i, 2, total2)
 
-        # layout = QVBoxLayout(self.confirmation_page.tableWidget)
-        
-        # self.confirmation_page.tableWidget.setShowGrid(True)
-        # self.confirmation_page.tableWidget.verticalHeader().setVisible(False)  
-        # self.confirmation_page.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers) 
 
 
     def to_sparepart(self):
@@ -378,7 +396,7 @@ class ConfirmationPage(QMainWindow):
 
     def update_sales(self):
         current_date = str(datetime.now().date())
-        data_sales = self.get_database(f'Sales/{self.type}')
+        data_sales = self.get_database(f'Sales/{self.type}/Sparepart')
         data_temp = {}
         for data in self.data[:-1]:
             data_temp.update({data['name']: {'quantity': data['quantity'], 'total': data['total']}})
@@ -393,7 +411,7 @@ class ConfirmationPage(QMainWindow):
             data_sales = {current_date:data_temp}
 
         try:
-            self.update_database(f"Sales/{self.type}", data_sales)
+            self.update_database(f"Sales/{self.type}/Sparepart", data_sales)
         except KeyError as e:
             print(e)
 
@@ -407,17 +425,19 @@ class ConfirmationPage(QMainWindow):
         
 
     def get_pdf(self):
-        data_buy = self.data
+        data_buy = self.data[:-1]
+        account = self.account
         
 
-        api_key = "a4b8MTQ4NzU6MTE5NTM6VHREamhxTExBSW5tQ3VPbA="
-        template_id = "efc77b23aef49cee"
+        api_key = "fe70MTUwOTM6MTIxNzI6ZUExbHZGTUk3czR4YnIydQ="
+        template_id = "d0877b23a514faf6"
+
 
         data = {
                 "brand_name": "CMech Service",
-                "invoice_no": "123 456789",
-                "invoice_date": "01 / 10 /2022  ",
-                "account_name": "Lorem Ipsum",
+                "invoice_no": f"{str(self.random_with_N_digits(3))} {str(self.random_with_N_digits(6))}",
+                "invoice_date": f"{str(datetime.now().date())}",
+                "account_name": f"{account.split('@', 1)[0]}",
                 "bank_det": "Bank Masyarakat Sejahtera",
                 "company_name": "CMech Service",
                 "street_address": "24 Los Angeles, India",
@@ -464,6 +484,11 @@ class ConfirmationPage(QMainWindow):
         button = success.exec()
         if button == QMessageBox.Ok:
             pass
+    
+    def random_with_N_digits(self, n):
+        range_start = 10**(n-1)
+        range_end = (10**n)-1
+        return randint(range_start, range_end)
 
 
 class MyBookingPage(QMainWindow):
