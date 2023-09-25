@@ -63,15 +63,15 @@ class UserMain(QMainWindow):
 
         self.push_sparepart = self.findChild(QPushButton, 'push_sparepart')
         self.push_sparepart.setIcon(QIcon("Pictures/sparepart.png"))
-        self.push_sparepart.setIconSize(QSize(65, 65))
+        self.push_sparepart.setIconSize(QSize(70, 75))
 
         self.push_reservation = self.findChild(QPushButton, 'push_reservation')
         self.push_reservation.setIcon(QIcon("Pictures/reservation.png"))
         self.push_reservation.setIconSize(QSize(90, 95))
 
         self.push_service_list = self.findChild(QPushButton, 'push_service_list')
-        self.push_service_list.setIcon(QIcon("Pictures/list.png"))
-        self.push_service_list.setIconSize(QSize(65, 65))
+        self.push_service_list.setIcon(QIcon("Pictures/service.png"))
+        self.push_service_list.setIconSize(QSize(110, 115))
     
     def alert(self):
         alert = QMessageBox(self)
@@ -99,12 +99,8 @@ class SparepartMenu(QMainWindow):
         self.label.setScaledContents(True)
         self.sparepart_menu.push_back.clicked.connect(self.to_user_main)
         self.sparepart_menu.Combobox.addItems(["Car", 'Motorcycle'])
-        self.beginning = True
-        if self.beginning:
-            self.scrollable_layout = SparepartWidget('/Sparepart/Car')
-            self.sparepart_menu.verticalLayout.addWidget(self.scrollable_layout)
-            self.beginning = False
-            self.selected_item = 'Car'
+        self.scrollable_layout = SparepartWidget("Sparepart/Car")
+        self.sparepart_menu.verticalLayout.addWidget(self.scrollable_layout)
         self.sparepart_menu.Combobox.currentIndexChanged.connect(self.insert_sparepart_menu)
         self.sparepart_menu.push_next.clicked.connect(self.to_confirmation)
 
@@ -151,14 +147,7 @@ class ReservationMenu(QMainWindow):
         self.reservation_page.push_back.clicked.connect(self.to_user_main)
         self.reservation_page.dateEdit.setMinimumDate(QDate.currentDate())
         self.reservation_page.push_booking.clicked.connect(self.booking_button)
-        self.beginning = True
-        if self.beginning:
-            services = self.get_database('ServiceList/Car')
-            list_service = []
-            for service in services.keys():
-                list_service.append(service)
-            self.reservation_page.service_list.addItems(list_service)
-            self.beginning = False
+        self.insert_type()
 
 
     def to_user_main(self):
