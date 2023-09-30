@@ -2,11 +2,12 @@ from PyQt5.QtWidgets import (QWidget, QLabel, QMessageBox,
                              QGridLayout, QScrollArea, QPushButton, 
                              QHBoxLayout, QVBoxLayout)
 import requests
+import os
 
-API_KEY = "AIzaSyCd9mCDnVPCDEzwPtYvmDZvWOAyQTpec1k"
+API_KEY = str(os.getenv("FIREBASE_API"))
 FIREBASE_URL = "https://projectbengkel-f2242-default-rtdb.asia-southeast1.firebasedatabase.app/"
 
-
+# class untuk widget sparepart
 class SparepartWidget(QWidget):
     def __init__(self, link):
         super().__init__()
@@ -16,35 +17,37 @@ class SparepartWidget(QWidget):
         self.data_buy = []
         self.set_scroll()
 
+    # fungsi untuk mengambil database dari firebase dan error handling
     def button_clicked(self, index, increment, name):
         check = 0
-        current_data = self.get_database(self.link)
+        current_data = self.get_database(self.link) # ambil data sekarang
         self.counters[index] += increment
         label = self.findChild(QLabel, f'label_{index}')
-        if self.counters[index] < 0:
+        if self.counters[index] < 0: # pemesanan tidak bisa negatif
             self.alert("Quantity cannot be negatif!")
             return
 
-        if current_data[name]['stock'] == 0:
+        if current_data[name]['stock'] == 0: # check jika stock sparepart habis atau tidak
             self.alert("Out of stock!")
             return
 
         if label is not None:
             label.setText(" " * 5 + str(self.counters[index]))
+        # update database sesuai dengan data yang dipilih
         for key, value in current_data.items():
             if key == name:
                 hold = value['stock'] - increment
                 data_hold = {name: {'price': value['price'], 'stock': hold}}
                 self.update_database(self.link, data_hold)
-        self.total_quantity_buy = sum(self.counters[1:])
-        self.total_price_buy = sum(self.counters[i] * float(data.get(list(data.keys())[0], {}).get('price')) for i, data in enumerate(self.list_data, start=1))
+        self.total_quantity_buy = sum(self.counters[1:]) # total kuantitas pembelian
+        self.total_price_buy = sum(self.counters[i] * float(data.get(list(data.keys())[0], {}).get('price')) for i, data in enumerate(self.list_data, start=1)) # todal harga pembelian
         for data in self.data_buy:
             if name == data['name']:
                 data['quantity'] = self.counters[index]
                 data['total'] = data['quantity'] * data['price']
                 check = 1
                 break
-        if check == 0:
+        if check == 0: # menaruh data yang belum ada
             self.data_buy.append({'name': name, 'quantity': self.counters[index], 'price': self.data[name]['price'], 'total': self.counters[index] * self.data[name]['price']})
             check = 1
 
@@ -61,6 +64,7 @@ class SparepartWidget(QWidget):
         if button == QMessageBox.Ok:
             pass
     
+    # mengambil data hasil pembelian
     def get_data_buy(self):
         self.data_buy.append({'Total quantity': self.total_quantity_buy, 'Total price': self.total_price_buy})
         for i in range(len(self.data_buy) - 1):
@@ -68,6 +72,7 @@ class SparepartWidget(QWidget):
                 del self.data_buy[i]
         return self.data_buy
 
+    # fungsi untuk menaruh scroll area secara dinamis
     def set_scroll(self):
         scroll_area = QScrollArea(self)
         scroll_area.setWidgetResizable(True)
@@ -170,6 +175,7 @@ class SparepartWidget(QWidget):
         requests.patch(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY, json = data)
 
 
+# custom css buat vertikal dan horizontal bar
 def custom_vertikal_bar():
     return ("/* VERTICAL SCROLLBAR */\n"
                                                         " QScrollBar:vertical {\n"

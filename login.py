@@ -1,4 +1,5 @@
 import requests
+import os
 
 import re
 from PyQt5 import uic
@@ -11,10 +12,10 @@ from user_main import UserMain
 from admin_main import AdminMain
 
 
-API_KEY = "AIzaSyCd9mCDnVPCDEzwPtYvmDZvWOAyQTpec1k"
+API_KEY = str(os.getenv("FIREBASE_API"))
 FIREBASE_URL = "https://projectbengkel-f2242-default-rtdb.asia-southeast1.firebasedatabase.app/"
 
-
+# class login
 class Login(QMainWindow):
     def __init__(self):
         super(Login, self).__init__()
@@ -22,9 +23,10 @@ class Login(QMainWindow):
         self.get_database()
         self.login_page = uic.loadUi('file_ui/login.ui', self)
 
-        self.init_widgets()
+        self.setup_ui()
 
-    def init_widgets(self):
+    # fungsi untuk melakukan setup ui
+    def setup_ui(self):
         self.username = self.findChild(QLineEdit, 'username_input')
         self.username.setCompleter(QCompleter(['admin@gmail.com', 'user@gmail.com']))
         self.password = self.findChild(QLineEdit, 'password_input')
@@ -41,42 +43,51 @@ class Login(QMainWindow):
         label.setScaledContents(True)
 
         if self.database_login is None:
-            self.put_database()
+            self.update_database()
         self.show()
 
+    # menuju page signup
     def to_create_account(self):
         self.navigate_to(Signup())
 
+    # menuju user main
     def to_user_main(self):
         self.navigate_to(UserMain(self.username.text().replace(".", "")))
         
 
+    # menuju admin main
     def to_admin_main(self):
         self.navigate_to(AdminMain())
 
+    # fungsi untuk navigasi ke page tertentu
     def navigate_to(self, window):
         if hasattr(self, 'login_page'):
             self.login_page.close()
         self.window = window
         self.window.show()
 
+    # fungsi untuk meminta database dari firebase
     def get_database(self):
         self.response_get = requests.get(FIREBASE_URL + '/Account.json?auth=' + API_KEY)
         self.database_login = self.response_get.json()
 
-    def put_database(self):
+    # fungsi untuk ngirim data ke database
+    def update_database(self):
         requests.put(FIREBASE_URL + '/Account.json?auth=' + API_KEY, json = {'admin@gmailcom': 'Admin1234'})
-
+    
+    # fungsi untuk verifikasi login
     def verify_login(self):
         username = self.username.text()
         password = self.password.text()
         username_nonvalid = True
         password_nonvalid = True
 
+        # menuju admin
         if username == 'admin@gmail.com' and password == 'Admin1234':
             self.to_admin_main()
             return
 
+        # menuju user
         for key, value in self.database_login.items():
             if key == username.replace('.', ''):
                 username_nonvalid = False
@@ -92,6 +103,7 @@ class Login(QMainWindow):
             self.password.clear()
             self.alert('Your input password is wrong!')
 
+    # notif
     def alert(self, text):
         alert = QMessageBox(self)
         alert.setWindowTitle('Alert!')
@@ -101,12 +113,14 @@ class Login(QMainWindow):
         button = alert.exec()
         if button == QMessageBox.Ok:
             pass
-
+    
+    # remove label
     def remove_label(self):
         self.username.clear()
         self.password.clear()
 
 
+# class signup
 class Signup(QMainWindow):
     def __init__(self):
         super(Signup, self).__init__()
@@ -115,9 +129,10 @@ class Signup(QMainWindow):
 
         self.signup_page = uic.loadUi('file_ui/signup.ui', self)
 
-        self.init_widgets()
+        self.setup_ui()
 
-    def init_widgets(self):
+    # fungsi untuk setup ui
+    def setup_ui(self):
         self.back_button = self.findChild(QPushButton, 'push_back')
         self.back_button.clicked.connect(self.to_login)
 
@@ -130,11 +145,13 @@ class Signup(QMainWindow):
 
         self.show()
 
+    # menuju login
     def to_login(self):
         if hasattr(self, 'signup_page'):
             self.signup_page.close()
         Login().show()
 
+    # fungsi untuk validasi dan ngirim data signup
     def create_account(self):
         username = self.username_input.text()
         password = self.password_input.text()

@@ -1,4 +1,5 @@
 import json, requests
+import os
 from datetime import datetime
 from random import randint
 
@@ -11,12 +12,11 @@ from PyQt5.QtGui import QPixmap, QIcon, QBrush, QColor
 from PyQt5.QtCore import QSize, QDate
 from user_widget import SparepartWidget, custom_vertikal_bar, custom_horizontal_bar
 
-
-API_KEY = "AIzaSyCd9mCDnVPCDEzwPtYvmDZvWOAyQTpec1k"
+API_KEY = str(os.getenv("FIREBASE_API"))
 FIREBASE_URL = "https://projectbengkel-f2242-default-rtdb.asia-southeast1.firebasedatabase.app/"
 
 
-
+# class user main
 class UserMain(QMainWindow):
     def __init__(self, account):
         super(UserMain, self).__init__()
@@ -25,6 +25,7 @@ class UserMain(QMainWindow):
         self.set_icon()
         self.show()
 
+    # fungsi setup ui
     def setup_ui(self):
         self.main_page = uic.loadUi('file_ui/user_main_menu.ui', self)
         self.create_account = self.findChild(QPushButton, 'push_sparepart')
@@ -42,6 +43,7 @@ class UserMain(QMainWindow):
     def to_service_list(self):
         self.navigate_to(ServiceListMenu(self.account))
     
+    # fungsi untuk ke page history booking, jika tidak ada data, maka akan ada notifikasi 
     def to_my_booking(self):
         try:
             self.navigate_to(MyBookingPage(self.account))
@@ -55,6 +57,7 @@ class UserMain(QMainWindow):
         self.window = window
         self.window.show()
     
+    # fungsi untuk setup icon
     def set_icon(self):
         self.label = self.findChild(QLabel, 'logo')
         pixmap = QPixmap('Pictures/image 2.png')
@@ -84,6 +87,7 @@ class UserMain(QMainWindow):
             pass
 
 
+# class sparepart 
 class SparepartMenu(QMainWindow):
     def __init__(self, account):
         super(SparepartMenu, self).__init__()
@@ -91,6 +95,7 @@ class SparepartMenu(QMainWindow):
         self.setup_ui()
         self.show()
     
+    # fungsi setup ui
     def setup_ui(self):
         self.sparepart_menu = uic.loadUi('file_ui/sparepart_menu.ui', self)
         self.label = self.findChild(QLabel, 'logo')
@@ -99,6 +104,7 @@ class SparepartMenu(QMainWindow):
         self.label.setScaledContents(True)
         self.sparepart_menu.push_back.clicked.connect(self.to_user_main)
         self.sparepart_menu.Combobox.addItems(["Car", 'Motorcycle'])
+        self.selected_item = self.sparepart_menu.Combobox.currentText()
         self.scrollable_layout = SparepartWidget("Sparepart/Car")
         self.sparepart_menu.verticalLayout.addWidget(self.scrollable_layout)
         self.sparepart_menu.Combobox.currentIndexChanged.connect(self.insert_sparepart_menu)
@@ -116,6 +122,7 @@ class SparepartMenu(QMainWindow):
         self.window = window
         self.window.show()
 
+    # fungsi untuk menaruh widget sparepart ke dalam layout vertical
     def insert_sparepart_menu(self):
         self.selected_item = self.sparepart_menu.Combobox.currentText()
         self.link = f"/Sparepart/{self.selected_item}"
@@ -125,6 +132,7 @@ class SparepartMenu(QMainWindow):
         self.sparepart_menu.verticalLayout.addWidget(self.scrollable_layout)
     
 
+# class reservasi
 class ReservationMenu(QMainWindow):
     def __init__(self, account):
         super(ReservationMenu, self).__init__()
@@ -134,6 +142,7 @@ class ReservationMenu(QMainWindow):
 
         self.show()
     
+    # fungsi setup ui
     def setup_ui(self):
         self.reservation_page = uic.loadUi('file_ui/reservation.ui', self)
         label = self.findChild(QLabel, 'logo')
@@ -155,12 +164,14 @@ class ReservationMenu(QMainWindow):
             self.reservation_page.close()
         self.user_main = UserMain(self.account).show()
 
+    # untuk mengambil hari dari input user
     def get_date(self):
         date = self.reservation_page.dateEdit.date()
         time = self.reservation_page.timeEdit.time()
         self.dt = datetime(date.year(), date.month(), date.day(), time.hour(), time.minute(), 0)
         return self.dt
 
+    # untuk memasukkan list service ke dalam combobox secara dinamis
     def insert_type(self):
         self.selected_type = self.reservation_page.type_input.currentText()
         link = f"ServiceList/{self.selected_type}"
@@ -171,33 +182,23 @@ class ReservationMenu(QMainWindow):
         self.reservation_page.service_list.clear()
         self.reservation_page.service_list.addItems(list_service)
 
+    # fungsi untuk menyimpan data reservasi
     def booking_button(self):
         self.selected_service = self.service_list.currentText()
         current_date = self.get_date()
         data_booking = {str(current_date): {'service': self.selected_service
                         }}
-        self.update_database(f"Booking/{self.account}", data_booking)
-        data_sales = {str(current_date.date()): {self.selected_service: 1}}
-        try:
-            current_data_service = self.get_database(f'Sales/{self.selected_type}/Service')
-            if str(current_date.date()) in current_data_service.keys():
-                if self.selected_service in current_data_service[str(current_date.date())].keys():
-                    current_data_service[str(current_date.date())][self.selected_service] += 1
-                    data_sales = current_data_service
-                else:
-                    current_data_service[str(current_date.date())][self.selected_service] = 1
-                    data_sales = current_data_service
-            self.update_database(f"Sales/{self.selected_type}/Service", data_sales)
-        except:
-            current_data_service = self.get_database('Sales/Car/Service')
-            if str(current_date.date()) in current_data_service.keys():
-                if self.selected_service in current_data_service[str(current_date.date())].keys():
-                    current_data_service[str(current_date.date())][self.selected_service] += 1
-                    data_sales = current_data_service
-                else:
-                    current_data_service[str(current_date.date())][self.selected_service] = 1
-                    data_sales = current_data_service
-            self.update_database("Sales/Car/Service", data_sales)
+        self.update_database(f"Booking/{self.account}", data_booking) # menaruh data booking pada account yang login
+        data_sales = {str(current_date.date()): {self.selected_service: 1}} # data sales
+        current_data_service = self.get_database(f'Sales/{self.selected_type}/Service') # mengambil data penjualan service berdasarkan type
+        if str(current_date.date()) in current_data_service.keys(): # check jika di hari yang sama sudah ada booking/belum
+            if self.selected_service in current_data_service[str(current_date.date())].keys(): # check jika service yang sama sudah ada atau belum
+                current_data_service[str(current_date.date())][self.selected_service] += 1 # jika ya maka jumlah pemesanan service akan menambah
+                data_sales = current_data_service
+            else:
+                current_data_service[str(current_date.date())][self.selected_service] = 1 # jika tidak maka jumlah pemesanan pada service itu akan disetting 1
+                data_sales = current_data_service
+            self.update_database(f"Sales/{self.selected_type}/Service", data_sales) # update data sales service
         self.success_book()
         self.to_user_main()
 
@@ -220,6 +221,7 @@ class ReservationMenu(QMainWindow):
             pass
 
 
+# class service list page
 class ServiceListMenu(QMainWindow):
     def __init__(self, account):
         super(ServiceListMenu, self).__init__()
@@ -232,13 +234,10 @@ class ServiceListMenu(QMainWindow):
         self.servicelist_menu = uic.loadUi('file_ui/service_list.ui', self)
         self.servicelist_menu.push_back.clicked.connect(self.to_user_main)
         self.servicelist_menu.Combobox.addItems(["Car", 'Motorcycle'])
-        beginning = True
-        if beginning:
-            self.link = '/ServiceList/Car'
-            self.scrollable_layout = self.list_service()
-            self.servicelist_menu.verticalLayout.addWidget(self.scrollable_layout)
-            beginning = False
-        self.servicelist_menu.Combobox.currentIndexChanged.connect(self.get_activated)
+        selected_item = self.servicelist_menu.Combobox.currentText()
+        self.link = f"/ServiceList/{selected_item}"
+        self.servicelist_menu.verticalLayout.addWidget(self.list_service())
+        self.servicelist_menu.Combobox.currentIndexChanged.connect(self.insert_list)
         label = self.findChild(QLabel, 'logo_sparepart')
         pixmap = QPixmap('Pictures/image 2.png')
         label.setPixmap(pixmap)
@@ -250,14 +249,15 @@ class ServiceListMenu(QMainWindow):
         self.user_main = UserMain(self.account)
         self.user_main.show()
 
-    def get_activated(self):
+    # ngambil type yang dipilih dan memasukkan widget pada fungsi list_service ke dalam layout
+    def insert_list(self):
         selected_item = self.servicelist_menu.Combobox.currentText()
         self.link = f"/ServiceList/{selected_item}"
         for i in reversed(range(self.servicelist_menu.verticalLayout.count())):
             self.servicelist_menu.verticalLayout.itemAt(i).widget().setParent(None)
         self.servicelist_menu.verticalLayout.addWidget(self.list_service())
 
-
+    # membuat widget untuk menampilkan list
     def list_service(self):
         scroll_area = QScrollArea(self)
         scroll_area.setWidgetResizable(True)
@@ -303,6 +303,7 @@ class ServiceListMenu(QMainWindow):
         requests.patch(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY, json = data)
 
 
+# class confirmation page
 class ConfirmationPage(QMainWindow):
     def __init__(self, data, account, type):
         super(ConfirmationPage, self).__init__()
@@ -324,6 +325,7 @@ class ConfirmationPage(QMainWindow):
 
         self.confirmation_page.push_buy.clicked.connect(self.clicked_buy)
 
+    # class untuk memasukkan data pembelian sparepart ke table
     def insert_table(self):
         self.total_quantity = self.data[-1]['Total quantity']
         self.total_price = self.data[-1]['Total price']
@@ -377,32 +379,30 @@ class ConfirmationPage(QMainWindow):
         self.sparepart_page = SparepartMenu(self.account)
         self.sparepart_page.show()
 
+    # save pdf dalam file
     def save_pdf(self, content, filename):
         with open(filename, 'wb') as f:
             f.write(content)
 
-
-
+    # class untuk update data sales berdasarkan tanggal dan type
     def update_sales(self):
         current_date = str(datetime.now().date())
-        data_sales = self.get_database(f'Sales/{self.type}/Sparepart')
+        data_sales = self.get_database(f'Sales/{self.type}/Sparepart') # mengambil data sparepart berdasarkan type
         data_temp = {}
         for data in self.data[:-1]:
-            data_temp.update({data['name']: {'quantity': data['quantity'], 'total': data['total']}})
+            data_temp.update({data['name']: {'quantity': data['quantity'], 'total': data['total']}}) # membuat data yang dikirim dari class sparepart menjadi dictionary
 
+        # check apakah tanggal dibeli sudah ada atau belum
         if current_date in data_sales.keys():
             for name, temp_data in data_temp.items():
                 if name in data_sales[current_date]:
-                    data_sales[current_date][name]['quantity'] += temp_data['quantity']
+                    data_sales[current_date][name]['quantity'] += temp_data['quantity'] # menambahkan data yang ada pada firebase dengan data yang dibeli jika sparepart yang dibeli sudah ada di database
                 else:
-                    data_sales[current_date][name] = temp_data
+                    data_sales[current_date][name] = temp_data # membuat cabang baru
         else:
-            data_sales = {current_date:data_temp}
+            data_sales = {current_date:data_temp} # menambahkan data pembelian berdasarkan tanggal jika tidak ada tanggal itu pada database
 
-        try:
-            self.update_database(f"Sales/{self.type}/Sparepart", data_sales)
-        except KeyError as e:
-            print(e)
+        self.update_database(f"Sales/{self.type}/Sparepart", data_sales)
 
     def get_database(self, directory):
         response_get = requests.get(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY)
@@ -413,14 +413,13 @@ class ConfirmationPage(QMainWindow):
         requests.patch(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY, json = data)
         
 
+    # fungsi untuk mengambil invoice.pdf dari APITemplate.io
     def get_pdf(self):
         data_buy = self.data[:-1]
         account = self.account
-        
-
+    
         api_key = "fe70MTUwOTM6MTIxNzI6ZUExbHZGTUk3czR4YnIydQ="
         template_id = "d0877b23a514faf6"
-
 
         data = {
                 "brand_name": "CMech Service",
@@ -456,8 +455,9 @@ class ConfirmationPage(QMainWindow):
             print(f"Error: {response.status_code}")
             return None
     
+    # kembali ke confirmation page
     def clicked_buy(self):
-        # self.get_pdf()
+        self.get_pdf()
         self.success_buy()
         self.update_sales()
         if hasattr(self, 'confirmation_page'):
@@ -474,12 +474,14 @@ class ConfirmationPage(QMainWindow):
         if button == QMessageBox.Ok:
             pass
     
+    # random number buat nomor invoice
     def random_with_N_digits(self, n):
         range_start = 10**(n-1)
         range_end = (10**n)-1
         return randint(range_start, range_end)
 
 
+# class buat booking 
 class MyBookingPage(QMainWindow):
     def __init__(self, account):
         super(MyBookingPage, self).__init__()
@@ -501,6 +503,7 @@ class MyBookingPage(QMainWindow):
             self.my_booking_page.close()
         UserMain(self.account).show()
 
+    # memasukkan widget scroll ke dalam layout
     def list_booking(self):
         scroll_area = QScrollArea(self)
         scroll_area.setWidgetResizable(True)

@@ -1,6 +1,7 @@
 import pandas as pd
 import seaborn as sns
 import requests
+import os
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
@@ -10,9 +11,10 @@ from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import QSize
 
 
-API_KEY = "AIzaSyCd9mCDnVPCDEzwPtYvmDZvWOAyQTpec1k"
+API_KEY = str(os.getenv("FIREBASE_API"))
 FIREBASE_URL = "https://projectbengkel-f2242-default-rtdb.asia-southeast1.firebasedatabase.app/"
 
+# class admin main
 class AdminMain(QMainWindow):
     def __init__(self):
         super(AdminMain, self).__init__()
@@ -61,6 +63,7 @@ class AdminMain(QMainWindow):
         self.window = window
         self.window.show()
 
+    # mengambil data sales sparepart dan service dan membuatnya menjadi dataframe
     def get_data_sales(self, type):
         database_sparepart = self.get_database(f'Sales/{type}/Sparepart')
         df_sparepart = pd.DataFrame([(date, product, info['quantity'], info['total']) 
@@ -86,6 +89,7 @@ class AdminMain(QMainWindow):
         requests.patch(FIREBASE_URL + f'/{directory}.json?auth=' + API_KEY, json = data)
 
 
+# membuat grafik
 class Graph(QMainWindow):
     def __init__(self, dataframe, type):
         super().__init__()
@@ -147,6 +151,7 @@ class Graph(QMainWindow):
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
 
+# class untuk menambah sparepart
 class AddSparepart(QMainWindow):
     def __init__(self):
         super(AddSparepart, self).__init__()
@@ -209,11 +214,7 @@ class AddSparepart(QMainWindow):
         if button == QMessageBox.Ok:
             pass
 
-        
-        
-
-    
-
+# class untuk menambahkan sparepart
 class AddService(QMainWindow):
     def __init__(self):
         super(AddService, self).__init__()
