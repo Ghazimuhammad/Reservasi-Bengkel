@@ -66,7 +66,7 @@ class AdminMain(QMainWindow):
     # mengambil data sales sparepart dan service dan membuatnya menjadi dataframe
     def get_data_sales(self, type):
         database_sparepart = self.get_database(f'Sales/{type}/Sparepart')
-        df_sparepart = pd.DataFrame([(date, product, info['quantity'], info['total']) 
+        df_sparepart = pd.DataFrame([(date, product, info['quantity'], info['total'] * info['quantity']) 
                    for date, products in database_sparepart.items() 
                    for product, info in products.items()],
                   columns=['Date', 'Product', 'Quantity', 'Total'])

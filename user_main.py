@@ -13,6 +13,7 @@ from PyQt5.QtCore import QSize, QDate
 from user_widget import SparepartWidget, custom_vertikal_bar, custom_horizontal_bar
 
 API_KEY = str(os.getenv("FIREBASE_API"))
+PDF_API = "498aMTUyMzA6MTIzMTA6dW1BTEVHMmVCVTR5Q1ZFQw="
 FIREBASE_URL = "https://projectbengkel-f2242-default-rtdb.asia-southeast1.firebasedatabase.app/"
 
 
@@ -418,8 +419,8 @@ class ConfirmationPage(QMainWindow):
         data_buy = self.data[:-1]
         account = self.account
     
-        api_key = "fe70MTUwOTM6MTIxNzI6ZUExbHZGTUk3czR4YnIydQ="
-        template_id = "d0877b23a514faf6"
+
+        template_id = "93477b23ac6dee8a"
 
         data = {
                 "brand_name": "CMech Service",
@@ -441,7 +442,7 @@ class ConfirmationPage(QMainWindow):
         data['items'] = data_buy
         response = requests.post(
             f"https://rest.apitemplate.io/v2/create-pdf?template_id={template_id}",
-            headers = {"X-API-KEY": f"{api_key}"},
+            headers = {"X-API-KEY": f"{PDF_API}"},
             json = data
         )
 
